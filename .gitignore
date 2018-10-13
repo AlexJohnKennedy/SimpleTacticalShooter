@@ -1,0 +1,12 @@
+# Ignore everything.  We'll whitelist what we want to pull in.
+/*
+/*/
+
+# Git meta files
+!.gitignore
+!.gitattributes
+!README.md
+
+# Only want to add assets and project settings to our repo
+!/Assets/
+!/ProjectSettings/
