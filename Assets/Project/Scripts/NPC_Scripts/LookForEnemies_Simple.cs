@@ -48,12 +48,16 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
 
     private bool CanSee(Collider target) {
         RaycastHit hitInfo;
+        
         if (Physics.Linecast(eyesPosition.position, target.transform.position, out hitInfo, sightLayerMask, QueryTriggerInteraction.Ignore)) {
             if (hitInfo.transform == target.transform) {
                 // We can see the target!
                 return true;
             }
         }
+        // Perform a 'numHorizontalChecks' by 'numVerticalChecks' number of line casts to try to see the character in the case he is partially obscured
+        
+
         return false;
     }
 }
