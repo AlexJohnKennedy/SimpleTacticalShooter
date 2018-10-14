@@ -90,7 +90,8 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         if (angleDelta > 0.0f) {
             float interpFactor = Mathf.SmoothDampAngle(angleDelta, 0.0f, ref currBodyAngularVelocity, timeToAimSeconds, maxTurningSpeedWhileAiming);
             interpFactor = 1.0f - interpFactor / angleDelta;
-            characterBody.transform.rotation = Quaternion.Slerp(characterBody.transform.rotation, pointsToTargetNoVertical, interpFactor);
+            characterBody.transform.rotation = Quaternion.Slerp(characterBody.transform.rotation, pointsToTargetNoVertical, interpFactor);  // Rotate character body.
+            gun.AimInDirection(Quaternion.Slerp(characterBody.transform.rotation, pointsToTarget, interpFactor) * characterBody.transform.forward); //Note that Quat * Vector is NOT commutative (vector * Quat fails)
         }
     }
 
