@@ -73,6 +73,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
 
     // Function to define how quickly the unity will aim towards the target.
     private void AimTowardsTarget(Collider target) {
+        agent.updateRotation = false;
         Vector3 targetDirection = target.transform.position - characterBody.transform.position; //Points towards the target directly.
 
         // Get a rotation which points in the target direction
@@ -85,7 +86,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
 
         float angleDelta = Quaternion.Angle(characterBody.transform.rotation, pointsToTarget);
 
-        // Calculate the interpolation factor, so we can slerp the angle and apply a smoothdamp ro
+        // Calculate the interpolation factor, so we can slerp the angle and apply a smoothdamp rotation
         if (angleDelta > 0.0f) {
             float interpFactor = Mathf.SmoothDampAngle(angleDelta, 0.0f, ref currBodyAngularVelocity, timeToAimSeconds, maxTurningSpeedWhileAiming);
             interpFactor = 1.0f - interpFactor / angleDelta;
@@ -94,6 +95,8 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
     }
 
     private void AimTowardsWalkDirection() {
+        agent.updateRotation = true;
+
         // Simply rotate smoothly back towards a local rotation of zero (to re-align with the nav agent)
         if (characterBody.transform.localRotation == Quaternion.identity) {
             return;     // We are already aligned!
@@ -101,7 +104,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         else {
             float angleDelta = Quaternion.Angle(characterBody.transform.localRotation, Quaternion.identity);
 
-            // Calculate the interpolation factor, so we can slerp the angle and apply a smoothdamp ro
+            // Calculate the interpolation factor, so we can slerp the angle and apply a smoothdamp rotation
             if (angleDelta > 0.0f) {
                 float interpFactor = Mathf.SmoothDampAngle(angleDelta, 0.0f, ref currBodyAngularVelocity, timeToAimSeconds, maxTurningSpeedWhileAiming);
                 interpFactor = 1.0f - interpFactor / angleDelta;
