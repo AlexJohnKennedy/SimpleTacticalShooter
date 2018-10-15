@@ -644,6 +644,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 537045318}
+  - {fileID: 1354150903}
   m_Father: {fileID: 297147724}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1417,6 +1418,8 @@ GameObject:
   - component: {fileID: 215206446}
   - component: {fileID: 215206449}
   - component: {fileID: 215206451}
+  - component: {fileID: 215206453}
+  - component: {fileID: 215206452}
   - component: {fileID: 215206450}
   m_Layer: 9
   m_Name: NPC
@@ -1518,9 +1521,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 215206444}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f923c17f26f3584bb1ac4119fbee0de, type: 3}
+  m_Script: {fileID: 11500000, guid: 750250bd596de4b4186cc147fe4d2553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pivotPoint: {fileID: 90017549}
+  muzzlePoint: {fileID: 1354150903}
+  hittableLayers:
+    serializedVersion: 2
+    m_Bits: 787
+  bulletDamage: 5
+  fireRate_waitTime: 0.1
+  baseInaccuracyDegrees: 0.1
+  maxInaccuracyDegrees: 10
+  movementInaccuracyScaleFactor: 1
+  recoilInaccuracyAddAmount: 0.5
+  inaccuracyRecoveryRate: 0.1
+  recoilOffsetBaseScaleFactor: 1
+  baseRecoilDirectionRandomness: 0
+  maxRecoilOffsetAngle: 30
+  movementRecoilMagnitudeScaleFactor: 1
+  movementRecoilDirectionRandomnessScaleFactor: 1
+  recoilRecoveryRate: 0.25
+  recoilPatternRecoveryTime: 0.75
+  recoilPatternHardResetTime: 1
 --- !u!114 &215206451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1540,6 +1563,29 @@ MonoBehaviour:
   timeToAimSeconds: 0.25
   maxTurningSpeedWhileAiming: 360
   characterBody: {fileID: 297147723}
+--- !u!114 &215206452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 215206444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42cab71c7e3266447822deb62e8dcac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+--- !u!114 &215206453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 215206444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 914d1ad4f3a54194290001f899f8bcf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &216457444
 GameObject:
   m_ObjectHideFlags: 0
@@ -9514,6 +9560,34 @@ MonoBehaviour:
   m_Area: 1
   m_IgnoreFromBuild: 0
   m_AffectedAgents: ffffffff
+--- !u!1 &1354150902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1354150903}
+  m_Layer: 9
+  m_Name: MuzzlePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1354150903
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1354150902}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.642}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 90017549}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1364182530
 GameObject:
   m_ObjectHideFlags: 0

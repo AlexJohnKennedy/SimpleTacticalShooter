@@ -15,7 +15,7 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
     public int numVerticalChecks;
 
     [HideInInspector]
-    public event EventHandler<List<Collider>> VisionUpdatedEvent;   // Interested parteis can receive updates when we do vision updates.
+    public event EventHandler<List<Collider>> VisionUpdatedEvent;   // Interested parties can receive updates when we do vision updates.
 
     private List<Collider> selfColliders;
     private float nextCheckTime;

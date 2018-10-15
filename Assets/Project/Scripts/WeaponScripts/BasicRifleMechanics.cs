@@ -9,6 +9,10 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     public Transform pivotPoint;
     public Transform muzzlePoint;
 
+    [Header("Projectile Attributes")]
+    public LayerMask hittableLayers;
+    public float bulletDamage;
+
     [Header("Firerate")]
     [Tooltip("How long the gun must wait after firing a shot before it can fire again!")]
     public float fireRate_waitTime;
@@ -159,7 +163,6 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         // Apply the recoil offset rotation
         bulletTrajectory = currAimpointOffset * bulletTrajectory;
 
-
         // Step 2: Actually do the projectile calculations
         FireProjectile(bulletTrajectory);
 
@@ -177,6 +180,21 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
         //DONE!
         return true;
+    }
+
+    private void FireProjectile(Vector3 trajectory) {
+        // DEBUG
+        Debug.DrawRay(muzzlePoint.position, trajectory * 100, Color.yellow);
+
+        // Simply fire a ray out of the muzzle, in the trajectory direction.
+        Ray bulletRay = new Ray(muzzlePoint.position, trajectory);
+        RaycastHit hitInfo;
+        if (Physics.Raycast(bulletRay, out hitInfo, 10000, hittableLayers, QueryTriggerInteraction.Ignore)) {
+            Damageable_EventInvoker damageable = hitInfo.collider.GetComponent<Damageable_EventInvoker>();
+            if (damageable != null) {
+                damageable.OnHit(this, new ProjectileHitEventArgs(bulletDamage, 0f, trajectory, 1000f, hitInfo.point));
+            }
+        }
     }
 
     public bool ShootAtPosition(Vector3 target, float movementSpeed) {
