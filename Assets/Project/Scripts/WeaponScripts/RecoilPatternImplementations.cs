@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NoRecoilPattern : MonoBehaviour, IRecoilPattern {
+public class NoRecoilPattern : IRecoilPattern {
 
     public Quaternion GetAimpointOffsetRotation(int shotInPattern) {
         return Quaternion.identity;

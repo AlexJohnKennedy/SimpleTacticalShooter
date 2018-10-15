@@ -4,35 +4,35 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EmptyGunMechanics : MonoBehaviour, IGunMechanics {
-    bool IGunMechanics.AimInDirection(Vector3 direction) {
+    public bool AimInDirection(Vector3 direction) {
         return false;
     }
 
-    bool IGunMechanics.AimInDirection(Vector3 direction, Func<Vector3, Vector3> interpolationFunction) {
+    public bool AimInDirection(Vector3 direction, Func<Vector3, Vector3> interpolationFunction) {
         return false;
     }
 
-    bool IGunMechanics.AimTowards(Vector3 position) {
+    public bool AimTowards(Vector3 position) {
         return false;
     }
 
-    bool IGunMechanics.AimTowards(Vector3 position, Func<Vector3, Vector3> interpolationFunction) {
+    public bool AimTowards(Vector3 position, Func<Vector3, Vector3> interpolationFunction) {
         return false;
     }
 
-    bool IGunMechanics.CanFireAgain() {
-        return true;
+    public bool CanFireAgain() {
+        return false;
     }
 
-    bool IGunMechanics.Fire(float movementSpeed) {
-        return true;
+    public int Fire(float movementSpeed) {
+        return -1;
     }
 
-    bool IGunMechanics.ShootAtPosition(Vector3 target, float movementSpeed) {
-        return true;
+    public int ShootAtPosition(Vector3 target, float movementSpeed) {
+        return -1;
     }
 
-    bool IGunMechanics.ShootInDirection(Vector3 direction, float movementSpeed) {
-        return true;
+    public int ShootInDirection(Vector3 direction, float movementSpeed) {
+        return -1;
     }
 }

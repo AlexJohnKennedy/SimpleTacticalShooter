@@ -79,6 +79,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         currAimpointOffset = Quaternion.identity;   // No offset!
         currPatternIndex = 0;
         nextPatternResetTime = nextPatternReduceTime = nextFireAgainTime = Time.time;
+        patternObj = new NoRecoilPattern();
     }
 
     // Update is called once per frame
@@ -90,6 +91,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
     private void RecoverAdditionalInaccuracy() {
         currAddititonalInaccuracy -= inaccuracyRecoveryRate * Time.deltaTime;
+        if (currAddititonalInaccuracy < 0) currAddititonalInaccuracy = 0;
     }
 
     private void RecoverAimpointOffset() {
@@ -107,7 +109,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
             }
             else {
                 // Keep reducing the pattern count accordingly to how much time has passed.
-                while (Time.time >= nextPatternReduceTime) {
+                while (Time.time >= nextPatternReduceTime && currPatternIndex > 0) {
                     currPatternIndex -= 1;
 
                     // Increment the 'next reduce time' by the wait time, in case we need to reduce the pattern more than once on this tick!
@@ -140,8 +142,8 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         return Time.time >= nextFireAgainTime;
     }
 
-    public bool Fire(float movementSpeed) {
-        if (!CanFireAgain()) return false;
+    public int Fire(float movementSpeed) {
+        if (!CanFireAgain()) return -1;
 
         // Step 1: Calculate where we should shoot, based on the current innaccuracy, recoil offsets, and recoil pattern.
 
@@ -152,7 +154,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         // Then, we will rotate THAT vector by the recoil offset rotation to get the final firing direction!
 
         // Randomly apply some 'innaccuracy' to a 'forward' vector
-        float inaccDeg = (baseInaccuracyDegrees + currAddititonalInaccuracy) * movementInaccuracyScaleFactor * movementSpeed;
+        float inaccDeg = (baseInaccuracyDegrees + currAddititonalInaccuracy) * (1 + (movementInaccuracyScaleFactor * movementSpeed));
         inaccDeg = (inaccDeg > maxInaccuracyDegrees) ? maxInaccuracyDegrees : inaccDeg;
         Vector2 randcomponent = UnityEngine.Random.insideUnitCircle * inaccDeg;  // Random point inside circle where radius rep's angle
         Vector3 innaccurateVector = Quaternion.Euler(randcomponent.x, randcomponent.y, 0f) * Vector3.forward;
@@ -171,7 +173,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         nextPatternReduceTime = Time.time + recoilPatternRecoveryTime;
         nextPatternResetTime = Time.time + recoilPatternHardResetTime;
 
-        currAimpointOffset = patternObj.GetAimpointOffsetRotation(currPatternIndex, recoilOffsetBaseScaleFactor * movementRecoilMagnitudeScaleFactor * movementSpeed) * currAimpointOffset;
+        currAimpointOffset = patternObj.GetAimpointOffsetRotation(currPatternIndex, recoilOffsetBaseScaleFactor * (1 + (movementRecoilMagnitudeScaleFactor * movementSpeed))) * currAimpointOffset;
         if (Quaternion.Angle(currAimpointOffset, Quaternion.identity) > maxRecoilOffsetAngle) {
             currAimpointOffset = Quaternion.RotateTowards(currAimpointOffset, Quaternion.identity, Quaternion.Angle(currAimpointOffset, Quaternion.identity) - maxRecoilOffsetAngle);
         }
@@ -179,7 +181,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         currAddititonalInaccuracy += recoilInaccuracyAddAmount;
 
         //DONE!
-        return true;
+        return currPatternIndex;
     }
 
     private void FireProjectile(Vector3 trajectory) {
@@ -197,12 +199,12 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         }
     }
 
-    public bool ShootAtPosition(Vector3 target, float movementSpeed) {
+    public int ShootAtPosition(Vector3 target, float movementSpeed) {
         AimTowards(target);
         return Fire(movementSpeed);
     }
 
-    public bool ShootInDirection(Vector3 direction, float movementSpeed) {
+    public int ShootInDirection(Vector3 direction, float movementSpeed) {
         AimInDirection(direction);
         return Fire(movementSpeed);
     }

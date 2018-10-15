@@ -8,11 +8,14 @@ using UnityEngine.AI;
 [RequireComponent(typeof(IGunMechanics))]         // The AI script will want to be able to fire it's gun.
 public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
 
-    public float standStillThreshold;           // How far away the target has to be for the AI to stand still to try and shoot.
-    public float aimAngleThreshold_Degrees;     // How close our aim point has to be to the target for the AI to try and shoot.
-    public float standingShootIntervalSeconds;  // How frequently the AI fires his gun when standing still.
-    public float walkingShootIntervalSeconds;   // How frequently the AI fires his gun when walking.
-    public float reactionTime;                  // How long it takes the AI to 'notice' or 'react' to a new target.
+    public float standStillThreshold;                   // How far away the target has to be for the AI to stand still to try and shoot.
+    public float aimAngleThreshold_Degrees;             // How close our aim point has to be to the target for the AI to try and shoot.
+    public float standingShootIntervalSeconds;          // How frequently the AI fires his gun when standing still.
+    public float walkingShootIntervalSeconds;           // How frequently the AI fires his gun when walking.
+    public float recoilRecoveryWaitIntervalSeconds;     // How long the AI waits to shoot again once the recoil gets too high.
+    public int maxBurstSize;                            // How far through the burst pattern the AI will spray until it will wait to shoot again.
+    public int maxBurstSizeRandomRange;                 // Randomness applied to the burst size.
+    public float reactionTime;                          // How long it takes the AI to 'notice' or 'react' to a new target.
 
     public float timeToAimSeconds;    // Used to control how quickly the character can rotate and aim!
     public float maxTurningSpeedWhileAiming;    // Degrees per second, maximum angular velocity for the character while turning. 
@@ -91,7 +94,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
             float interpFactor = Mathf.SmoothDampAngle(angleDelta, 0.0f, ref currBodyAngularVelocity, timeToAimSeconds, maxTurningSpeedWhileAiming);
             interpFactor = 1.0f - interpFactor / angleDelta;
             characterBody.transform.rotation = Quaternion.Slerp(characterBody.transform.rotation, pointsToTargetNoVertical, interpFactor);  // Rotate character body.
-            gun.AimInDirection(Quaternion.Slerp(characterBody.transform.rotation, pointsToTarget, interpFactor) * characterBody.transform.forward); //Note that Quat * Vector is NOT commutative (vector * Quat fails)
+            //gun.AimInDirection(Quaternion.Slerp(characterBody.transform.rotation, pointsToTarget, interpFactor) * characterBody.transform.forward); //Note that Quat * Vector is NOT commutative (vector * Quat fails)
         }
     }
 
@@ -118,10 +121,14 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         //Shoot at a target if we are looking sufficiently 'close' to the point, and if our 'next shoot time' has been reached.
         if (CheckAimAngle(target) < aimAngleThreshold_Degrees && Time.time >= nextShootTime && gun.CanFireAgain()) {
             // Shoot at that boy!
-            gun.Fire(agent.velocity.magnitude);
-            
+            int patternIndex = gun.Fire(agent.velocity.magnitude);
+
             // Reset shooting wait timer.
-            if (agent.velocity.magnitude > 0.1f) {
+            System.Random rand = new System.Random();
+            if (patternIndex > maxBurstSize + rand.Next(-maxBurstSizeRandomRange, maxBurstSizeRandomRange)) {
+                nextShootTime = Time.time + recoilRecoveryWaitIntervalSeconds;
+            }
+            else if (agent.velocity.magnitude > 0.1f) {
                 nextShootTime = Time.time + walkingShootIntervalSeconds;
             }
             else {
