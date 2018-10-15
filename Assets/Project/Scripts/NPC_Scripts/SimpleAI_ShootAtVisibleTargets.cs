@@ -142,7 +142,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         Vector3 pointsToTarget = target.transform.position - transform.position;
         pointsToTarget.y = 0;   //Remove the vertical component.
 
-        Vector3 forwardNoVertical = transform.forward;
+        Vector3 forwardNoVertical = characterBody.transform.forward;
         forwardNoVertical.y = 0;
 
         float angle = Vector3.Angle(forwardNoVertical, pointsToTarget);

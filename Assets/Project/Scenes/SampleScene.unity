@@ -1131,7 +1131,8 @@ MonoBehaviour:
   bulletDamage: 5
   fireRate_waitTime: 0.1
   baseInaccuracyDegrees: 0.1
-  maxInaccuracyDegrees: 10
+  maxUnscaledInaccuracyDegrees: 0
+  maxScaledInaccuracyDegrees: 0
   movementInaccuracyScaleFactor: 1
   recoilInaccuracyAddAmount: 0.5
   inaccuracyRecoveryRate: 0.1
@@ -1172,7 +1173,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 168848878}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32af105f94cc44a409ab25cfac9044b4, type: 3}
   m_Name: 
@@ -1181,6 +1182,9 @@ MonoBehaviour:
   aimAngleThreshold_Degrees: 1
   standingShootIntervalSeconds: 0.1
   walkingShootIntervalSeconds: 0.2
+  recoilRecoveryWaitIntervalSeconds: 0
+  maxBurstSize: 0
+  maxBurstSizeRandomRange: 0
   reactionTime: 0.5
   timeToAimSeconds: 0.25
   maxTurningSpeedWhileAiming: 360
@@ -1782,20 +1786,21 @@ MonoBehaviour:
   hittableLayers:
     serializedVersion: 2
     m_Bits: 787
-  bulletDamage: 0.2
+  bulletDamage: 0
   fireRate_waitTime: 0.1
   baseInaccuracyDegrees: 0.1
-  maxInaccuracyDegrees: 10
+  maxUnscaledInaccuracyDegrees: 5
+  maxScaledInaccuracyDegrees: 30
   movementInaccuracyScaleFactor: 1.5
   recoilInaccuracyAddAmount: 0.2
-  inaccuracyRecoveryRate: 0.1
+  inaccuracyRecoveryRate: 0.9
   recoilOffsetBaseScaleFactor: 1
   baseRecoilDirectionRandomness: 0
   maxRecoilOffsetAngle: 30
   movementRecoilMagnitudeScaleFactor: 1
   movementRecoilDirectionRandomnessScaleFactor: 1
   recoilRecoveryRate: 0.25
-  recoilPatternRecoveryTime: 0.75
+  recoilPatternRecoveryTime: 0.11
   recoilPatternHardResetTime: 1
 --- !u!114 &215206451
 MonoBehaviour:
@@ -1809,9 +1814,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   standStillThreshold: 10
-  aimAngleThreshold_Degrees: 100
+  aimAngleThreshold_Degrees: 10
   standingShootIntervalSeconds: 0.1
   walkingShootIntervalSeconds: 0.23
+  recoilRecoveryWaitIntervalSeconds: 0.75
+  maxBurstSize: 8
+  maxBurstSizeRandomRange: 0
   reactionTime: 0.5
   timeToAimSeconds: 0.25
   maxTurningSpeedWhileAiming: 360

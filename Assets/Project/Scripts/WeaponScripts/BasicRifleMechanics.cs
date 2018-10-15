@@ -33,8 +33,10 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
     [Tooltip("The range in degrees that the random direction offset can be when firing")]
     public float baseInaccuracyDegrees;
-    [Tooltip("The maximum inaccuracy for any shot fired")]
-    public float maxInaccuracyDegrees;
+    [Tooltip("The maximum inaccuracy for any shot fired, BEFORE movement scaling is applied")]
+    public float maxUnscaledInaccuracyDegrees;
+    [Tooltip("The absolute maximum inaccuracy for any shot fired, even if moving at infinite speed")]
+    public float maxScaledInaccuracyDegrees;
     [Tooltip("Scaling for how much inaccuracy is added by the character's movement speed")]
     public float movementInaccuracyScaleFactor;
     [Tooltip("How much inaccuracy in degrees should be added per shot, due to recoil")]
@@ -154,8 +156,9 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         // Then, we will rotate THAT vector by the recoil offset rotation to get the final firing direction!
 
         // Randomly apply some 'innaccuracy' to a 'forward' vector
+        if (currAddititonalInaccuracy + baseInaccuracyDegrees > maxUnscaledInaccuracyDegrees) { currAddititonalInaccuracy = maxUnscaledInaccuracyDegrees - baseInaccuracyDegrees; } 
         float inaccDeg = (baseInaccuracyDegrees + currAddititonalInaccuracy) * (1 + (movementInaccuracyScaleFactor * movementSpeed));
-        inaccDeg = (inaccDeg > maxInaccuracyDegrees) ? maxInaccuracyDegrees : inaccDeg;
+        inaccDeg = (inaccDeg > maxScaledInaccuracyDegrees) ? maxScaledInaccuracyDegrees : inaccDeg;
         Vector2 randcomponent = UnityEngine.Random.insideUnitCircle * inaccDeg;  // Random point inside circle where radius rep's angle
         Vector3 innaccurateVector = Quaternion.Euler(randcomponent.x, randcomponent.y, 0f) * Vector3.forward;
 
@@ -168,17 +171,16 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         // Step 2: Actually do the projectile calculations
         FireProjectile(bulletTrajectory);
 
-        // Step 3: Update timers, update recoil offsets, and update the additional inaccuracy.
+        // Step 3: Update timers, update recoil offsets, update the additional inaccuracy, and update the current pattern index
         nextFireAgainTime = Time.time + fireRate_waitTime;
         nextPatternReduceTime = Time.time + recoilPatternRecoveryTime;
         nextPatternResetTime = Time.time + recoilPatternHardResetTime;
-
         currAimpointOffset = patternObj.GetAimpointOffsetRotation(currPatternIndex, recoilOffsetBaseScaleFactor * (1 + (movementRecoilMagnitudeScaleFactor * movementSpeed))) * currAimpointOffset;
         if (Quaternion.Angle(currAimpointOffset, Quaternion.identity) > maxRecoilOffsetAngle) {
             currAimpointOffset = Quaternion.RotateTowards(currAimpointOffset, Quaternion.identity, Quaternion.Angle(currAimpointOffset, Quaternion.identity) - maxRecoilOffsetAngle);
         }
-
         currAddititonalInaccuracy += recoilInaccuracyAddAmount;
+        currPatternIndex++;
 
         //DONE!
         return currPatternIndex;
