@@ -21,3 +21,8 @@ public interface IGunMechanics {
     bool ShootInDirection(Vector3 direction, float movementSpeed);   //Possibly should pass in a handler for hit info?
     bool ShootAtPosition(Vector3 target, float movementSpeed);       //Possibly should pass in a handler for hit info?
 }
+
+public interface IRecoilPattern {
+    Quaternion GetAimpointOffsetRotation(int shotInPattern);     // gets the offset rotation for the 'nth' shot in the recoil pattern.
+    Quaternion GetAimpointOffsetRotation(int shotInPattern, float scaleFactor);     // gets the offset, but scales the magnitude of the recoil rotation.
+}
