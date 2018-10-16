@@ -92,8 +92,8 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
         // TODO move to factory.
         patternObj = new NoRecoilPattern();
-        inaccuracyRecoveryFormula = InaccuracyRecoveryForumlas.GetConstantRecoveryFunction();   // CONSTANT (same as before)
-        recoilRecoveryFormula = RecoilRecoveryFormulas.GetConstantRecoveryFunction();           // CONSTANT (same as before)
+        inaccuracyRecoveryFormula = InaccuracyRecoveryForumlas.GetLinearlyScaledRecoveryFunction(1);   // Recovery linearly increases as the offset increases.
+        recoilRecoveryFormula = RecoilRecoveryFormulas.GetLinearlyScaledRecoveryFunction(1);
     }
 
     // Update is called once per frame
@@ -123,8 +123,8 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
             }
             else if (Time.time > nextPatternStartReducingTime) {
                 // Keep reducing the pattern count accordingly to how much time has passed, past the start reducing time.
-                nextPatternReduceTime = nextPatternStartReducingTime + recoilPatternRecoveryTime;
                 while (Time.time >= nextPatternReduceTime && currPatternIndex > 0) {
+                    // DebuggingHelpers.Log("start reduce time: " + nextPatternStartReducingTime + ", nextPatternReduceTime: " + nextPatternReduceTime + ", Time: " + Time.time + ", Pattern Index: " + currPatternIndex);
                     currPatternIndex -= 1;
 
                     // Increment the 'next reduce time' by the wait time, in case we need to reduce the pattern more than once on this tick!
@@ -187,6 +187,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         // Step 3: Update timers, update recoil offsets, update the additional inaccuracy, and update the current pattern index
         nextFireAgainTime = Time.time + fireRate_waitTime;
         nextPatternStartReducingTime = Time.time + recoilPatternContinuousFireWindow;
+        nextPatternReduceTime = nextPatternStartReducingTime + recoilPatternRecoveryTime;
         nextPatternResetTime = Time.time + recoilPatternHardResetTime;
         currAimpointOffset = patternObj.GetAimpointOffsetRotation(currPatternIndex, recoilOffsetBaseScaleFactor * (1 + (movementRecoilMagnitudeScaleFactor * movementSpeed))) * currAimpointOffset;
         if (Quaternion.Angle(currAimpointOffset, Quaternion.identity) > maxRecoilOffsetAngle) {
