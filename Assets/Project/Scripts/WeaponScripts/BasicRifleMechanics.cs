@@ -91,7 +91,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         nextPatternResetTime = nextPatternReduceTime = nextFireAgainTime = nextPatternStartReducingTime = Time.time;
 
         // TODO move to factory.
-        patternObj = new NoRecoilPattern();
+        patternObj = new SimpleConstantVerticalRecoilPattern();
         inaccuracyRecoveryFormula = InaccuracyRecoveryForumlas.GetLinearlyScaledRecoveryFunction(1);   // Recovery linearly increases as the offset increases.
         recoilRecoveryFormula = RecoilRecoveryFormulas.GetLinearlyScaledRecoveryFunction(1);
     }
@@ -175,11 +175,12 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         Vector2 randcomponent = UnityEngine.Random.insideUnitCircle * inaccDeg;  // Random point inside circle where radius rep's angle
         Vector3 innaccurateVector = Quaternion.Euler(randcomponent.x, randcomponent.y, 0f) * Vector3.forward;
 
+        // Apply the recoil offset rotation
+        innaccurateVector = currAimpointOffset * innaccurateVector;
+
         // Orient the innaccurate Vector with the muzzle direction ('true' aimpoint)
         Vector3 bulletTrajectory = muzzlePoint.rotation * innaccurateVector;
 
-        // Apply the recoil offset rotation
-        bulletTrajectory = currAimpointOffset * bulletTrajectory;
 
         // Step 2: Actually do the projectile calculations
         FireProjectile(bulletTrajectory);
@@ -203,7 +204,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     private void FireProjectile(Vector3 trajectory) {
         // DEBUG
         DebuggingHelpers.DrawRay(muzzlePoint.position, trajectory * 100, Color.yellow);
-        DebuggingHelpers.Log("FIRING GUN: Recoil pattern is " + currPatternIndex);
+        // DebuggingHelpers.Log("FIRING GUN: Recoil pattern is " + currPatternIndex);
 
         // Simply fire a ray out of the muzzle, in the trajectory direction.
         Ray bulletRay = new Ray(muzzlePoint.position, trajectory);
