@@ -1818,8 +1818,8 @@ MonoBehaviour:
   standingShootIntervalSeconds: 0.1
   walkingShootIntervalSeconds: 0.23
   recoilRecoveryWaitIntervalSeconds: 0.75
-  maxBurstSize: 8
-  maxBurstSizeRandomRange: 0
+  maxBurstSize: 5
+  maxBurstSizeRandomRange: 1
   reactionTime: 0.5
   timeToAimSeconds: 0.25
   maxTurningSpeedWhileAiming: 360

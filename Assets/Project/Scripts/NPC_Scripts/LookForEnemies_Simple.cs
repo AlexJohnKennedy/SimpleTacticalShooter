@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using HelperFunctions;
 
 public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
 
@@ -52,6 +53,8 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
 	}
 
     private bool CanSee(Collider target) {
+        DebuggingHelpers.DrawAxisAlignedBoundingBox(target.bounds, Color.cyan);
+
         if (LineCastCheck(target, target.transform.position)) { return true; }
 
         // Perform a 'numHorizontalChecks' by 'numVerticalChecks' number of line casts to try to see the character in the case he is partially obscured
@@ -69,7 +72,7 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
         Vector3 verticalOffsetDirection = Vector3.Cross(target.transform.position - eyesPosition.position, Vector3.right).normalized;
 
         // Start at the 'top right' of the checking grid.
-        Vector3 pointToCheck = target.transform.position - (horizontalOffsetDirection * (width * 0.95f / 2)) - (verticalOffsetDirection * (height * 0.95f / 2));
+        Vector3 pointToCheck = target.bounds.center - (horizontalOffsetDirection * (width * 0.95f / 2)) - (verticalOffsetDirection * (height * 0.95f / 2));
 
         if (LineCastCheck(target, pointToCheck)) { return true; }
 
@@ -92,7 +95,7 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
 
     private bool LineCastCheck(Collider target, Vector3 point) {
         RaycastHit hitInfo;
-
+        //DebuggingHelpers.DrawLine(eyesPosition.position, point, Color.red);
         if (Physics.Linecast(eyesPosition.position, point, out hitInfo, sightLayerMask, QueryTriggerInteraction.Ignore)) {
             if (hitInfo.transform == target.transform) {
                 // We can see the target!
