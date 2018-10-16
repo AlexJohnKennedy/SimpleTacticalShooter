@@ -63,7 +63,10 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
             
             // If the target is further away than the stand still threshold, then we should stop moving to aim carefully!
             if (Vector3.Distance(transform.position, currentTarget.transform.position) > standStillThreshold) {
-                agent.isStopped = true; //Pause the agent's path.
+                agent.isStopped = true;  // Pause the agent's path.
+            }
+            else {
+                agent.isStopped = false; // Resume walking if the target get's too close!
             }
 
             AttemptToShoot(currentTarget);

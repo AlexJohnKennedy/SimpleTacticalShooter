@@ -1792,7 +1792,7 @@ MonoBehaviour:
   baseInaccuracyDegrees: 0.1
   maxUnscaledInaccuracyDegrees: 5
   maxScaledInaccuracyDegrees: 30
-  movementInaccuracyScaleFactor: 1
+  movementInaccuracyScaleFactor: 3.5
   recoilInaccuracyAddAmount: 0.2
   inaccuracyRecoveryRate: 0.9
   recoilOffsetBaseScaleFactor: 1
@@ -1818,7 +1818,7 @@ MonoBehaviour:
   standStillThreshold: 10
   aimAngleThreshold_Degrees: 10
   standingShootIntervalSeconds: 0.1
-  walkingShootIntervalSeconds: 0.23
+  walkingShootIntervalSeconds: 0.19
   recoilRecoveryWaitIntervalSeconds: 0.4
   maxBurstSize: 5
   maxBurstSizeRandomRange: 1
