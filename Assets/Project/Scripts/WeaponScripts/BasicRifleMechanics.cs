@@ -73,6 +73,10 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     private IRecoilPattern patternObj;
     private int currPatternIndex;               // Which 'shot' we are up to in the pattern.
 
+    // Generic functions which define how innaccuracy and recoil recovers, relative to current inaccuracy and current recoil offset
+    private Func<float, float, float, float> inaccuracyRecoveryFormula;     // (float currentAdditionalInaccuracy, float recoveryRateValue, float deltaTime)
+    private Func<Quaternion, float, float, float> recoilRecoveryFormula;    // (float currentOffset, float recoveryRateValue, float deltaTime)
+
     // Timers
     private float nextPatternStartReducingTime;
     private float nextPatternReduceTime;
@@ -85,7 +89,11 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         currAimpointOffset = Quaternion.identity;   // No offset!
         currPatternIndex = 0;
         nextPatternResetTime = nextPatternReduceTime = nextFireAgainTime = nextPatternStartReducingTime = Time.time;
+
+        // TODO move to factory.
         patternObj = new NoRecoilPattern();
+        inaccuracyRecoveryFormula = InaccuracyRecoveryForumlas.GetConstantRecoveryFunction();   // CONSTANT (same as before)
+        recoilRecoveryFormula = RecoilRecoveryFormulas.GetConstantRecoveryFunction();           // CONSTANT (same as before)
     }
 
     // Update is called once per frame
@@ -96,13 +104,13 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     }
 
     private void RecoverAdditionalInaccuracy() {
-        currAddititonalInaccuracy -= inaccuracyRecoveryRate * Time.deltaTime;
+        currAddititonalInaccuracy -= inaccuracyRecoveryFormula(currAddititonalInaccuracy, inaccuracyRecoveryRate, Time.deltaTime);
         if (currAddititonalInaccuracy < 0) currAddititonalInaccuracy = 0;
     }
 
     private void RecoverAimpointOffset() {
         // Reduce the offset rotation back towards the Identity Quaternion over time.
-        currAimpointOffset = Quaternion.RotateTowards(currAimpointOffset, Quaternion.identity, recoilRecoveryRate * Time.deltaTime);
+        currAimpointOffset = Quaternion.RotateTowards(currAimpointOffset, Quaternion.identity, recoilRecoveryFormula(currAimpointOffset, recoilRecoveryRate, Time.deltaTime));
     }
 
     private void RecoverRecoilPattern() {
@@ -215,5 +223,60 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     public int ShootInDirection(Vector3 direction, float movementSpeed) {
         AimInDirection(direction);
         return Fire(movementSpeed);
+    }
+}
+
+public static class InaccuracyRecoveryForumlas {
+    // FUNCTION FACTORY FUNCTION: Returns a function with the appropriate constant offset.
+    public static Func<float, float, float, float> GetConstantRecoveryFunction() {
+        return (float currentAdditionalInaccuracy, float recoveryRateValue, float deltaTime) => recoveryRateValue * deltaTime;
+    }
+
+    // FUNCTION FACTORY FUNCTION: Returns a function which scales recovery linearly compared to current offset, with the appropriate constant offset.
+    public static Func<float, float, float, float> GetLinearlyScaledRecoveryFunction(float yIntercept, float maxRecoveryPerSecond = Mathf.Infinity, float minRecoveryPerSecond = 0f) {
+        return (float currentAdditionalInaccuracy, float recoveryRateValue, float deltaTime) => {
+            if (yIntercept < 0) { yIntercept = 0; }
+            float recoveryPerSec = (yIntercept + currentAdditionalInaccuracy) * recoveryRateValue;
+            recoveryPerSec = Mathf.Clamp(recoveryPerSec, minRecoveryPerSecond, maxRecoveryPerSecond);
+            return recoveryPerSec * deltaTime;
+        };
+    }
+
+    // FUNCTION FACTORY FUNCTION: Returns a function which scaled recovery proportionally squared, with the appropriate constant constant offset.
+    public static Func<float, float, float, float> GetSquareScaledRecoveryFunction(float yIntercept, float maxRecoveryPerSecond = Mathf.Infinity, float minRecoveryPerSecond = 0f) {
+        return (float currentAdditionalInaccuracy, float recoveryRateValue, float deltaTime) => {
+            if (yIntercept < 0) { yIntercept = 0; }
+            float recoveryPerSec =  (yIntercept + currentAdditionalInaccuracy * currentAdditionalInaccuracy) * recoveryRateValue;
+            recoveryPerSec = Mathf.Clamp(recoveryPerSec, minRecoveryPerSecond, maxRecoveryPerSecond);
+            return recoveryPerSec * deltaTime;
+        };
+    }
+}
+
+public static class RecoilRecoveryFormulas {
+    public static Func<Quaternion, float, float, float> GetConstantRecoveryFunction() {
+        return (Quaternion currentOffset, float recoveryRateValue, float deltaTime) => recoveryRateValue * deltaTime; 
+    }
+
+    public static Func<Quaternion, float, float, float> GetLinearlyScaledRecoveryFunction(float yIntercept, float maxRecoveryPerSecond = Mathf.Infinity, float minRecoveryPerSecond = 0f) {
+        return (Quaternion currentOffset, float recoveryRateValue, float deltaTime) => {
+            if (yIntercept < 0) { yIntercept = 0; }
+
+            float angle = Quaternion.Angle(currentOffset, Quaternion.identity);
+            float recoveryPerSec = (yIntercept + angle) * recoveryRateValue;
+            recoveryPerSec = Mathf.Clamp(recoveryPerSec, minRecoveryPerSecond, maxRecoveryPerSecond);
+            return recoveryPerSec * deltaTime;
+        };
+    }
+
+    public static Func<Quaternion, float, float, float> GetSquaredScaledRecoveryFunction(float yIntercept, float maxRecoveryPerSecond = Mathf.Infinity, float minRecoveryPerSecond = 0f) {
+        return (Quaternion currentOffset, float recoveryRateValue, float deltaTime) => {
+            if (yIntercept < 0) { yIntercept = 0; }
+
+            float angle = Quaternion.Angle(currentOffset, Quaternion.identity);
+            float recoveryPerSec = (yIntercept + angle * angle) * recoveryRateValue;
+            recoveryPerSec = Mathf.Clamp(recoveryPerSec, minRecoveryPerSecond, maxRecoveryPerSecond);
+            return recoveryPerSec * deltaTime;
+        };
     }
 }
