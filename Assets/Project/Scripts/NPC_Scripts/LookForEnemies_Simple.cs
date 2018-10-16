@@ -53,7 +53,7 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
 	}
 
     private bool CanSee(Collider target) {
-        DebuggingHelpers.DrawAxisAlignedBoundingBox(target.bounds, Color.cyan);
+        // DebuggingHelpers.DrawAxisAlignedBoundingBox(target.bounds, Color.cyan);
 
         if (LineCastCheck(target, target.transform.position)) { return true; }
 
@@ -95,7 +95,7 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
 
     private bool LineCastCheck(Collider target, Vector3 point) {
         RaycastHit hitInfo;
-        //DebuggingHelpers.DrawLine(eyesPosition.position, point, Color.red);
+        // DebuggingHelpers.DrawLine(eyesPosition.position, point, Color.red);
         if (Physics.Linecast(eyesPosition.position, point, out hitInfo, sightLayerMask, QueryTriggerInteraction.Ignore)) {
             if (hitInfo.transform == target.transform) {
                 // We can see the target!
