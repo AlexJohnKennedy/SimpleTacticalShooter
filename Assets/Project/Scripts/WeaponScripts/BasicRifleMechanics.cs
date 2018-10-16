@@ -42,7 +42,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     public float movementInaccuracyScaleFactor;
     [Tooltip("How much inaccuracy in degrees should be added per shot, due to recoil")]
     public float recoilInaccuracyAddAmount;
-    [Tooltip("How quickly the current inaccuracy reduces back to base inaccuracy, in degrees per second")]
+    [Tooltip("How quickly the current inaccuracy reduces back to base inaccuracy, in degrees per second (before formula scaling, see the inaccuracyRecoveryFormula)")]
     public float inaccuracyRecoveryRate;
 
 
@@ -58,7 +58,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     public float movementRecoilMagnitudeScaleFactor;
     [Tooltip("Scaling for how much the random direction of the recoil is increased by the character's movement speed")]
     public float movementRecoilDirectionRandomnessScaleFactor;
-    [Tooltip("How quickly the recoil-aimpoint-offset reduces back to zero, in degrees per second")]
+    [Tooltip("How quickly the recoil-aimpoint-offset reduces back to zero, in degrees per second (before formula scaling, see the recoilRecoveryFormula")]
     public float recoilRecoveryRate;
     [Tooltip("How long the gun has to wait after firing until the recoil pattern starts to recover. This should generally by at least as long as the fire-rate interval, or else recoil pattern recovery may be inconsistent")]
     public float recoilPatternContinuousFireWindow;
@@ -162,25 +162,13 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
         // Step 1: Calculate where we should shoot, based on the current innaccuracy, recoil offsets, and recoil pattern.
 
-        // To gerenate some innaccuracy, we will not generate a random 'rotation', but instead start with a forward facing vector and
-        // add to it some random x and y direction, scaled by the inaccuracy. This has the benefit of biasing the randomness sllightly towards
-        // the centre of the 'circle', and is also mathematically simpler than applying tons of random rotations in Quaternion form.
-        // Then, we will rotate the resulting vector be the muzzle's transform.rotation to make it oriented with transform.forward (with innaccuracy).
-        // Then, we will rotate THAT vector by the recoil offset rotation to get the final firing direction!
-
         // Randomly apply some 'innaccuracy' to a 'forward' vector
-        if (currAddititonalInaccuracy + baseInaccuracyDegrees > maxUnscaledInaccuracyDegrees) { currAddititonalInaccuracy = maxUnscaledInaccuracyDegrees - baseInaccuracyDegrees; } 
-        float inaccDeg = (baseInaccuracyDegrees + currAddititonalInaccuracy) * (1 + (movementInaccuracyScaleFactor * movementSpeed));
-        inaccDeg = (inaccDeg > maxScaledInaccuracyDegrees) ? maxScaledInaccuracyDegrees : inaccDeg;
-        Vector2 randcomponent = UnityEngine.Random.insideUnitCircle * inaccDeg;  // Random point inside circle where radius rep's angle
-        Vector3 innaccurateVector = Quaternion.Euler(randcomponent.x, randcomponent.y, 0f) * Vector3.forward;
-
-        // Apply the recoil offset rotation
+        Vector3 innaccurateVector = ApplyInaccuracy_WorldSpaceRelative(Vector3.forward, movementSpeed);
+        // Apply the recoil offset rotation. This must be done BEFORE we orientate the vector relative to the muzzle, because the recoil offset rotations will be given to us in WORLD SPACE. 
+        // Thus, we must apply the offset to the forward world space vector.
         innaccurateVector = currAimpointOffset * innaccurateVector;
-
         // Orient the innaccurate Vector with the muzzle direction ('true' aimpoint)
         Vector3 bulletTrajectory = muzzlePoint.rotation * innaccurateVector;
-
 
         // Step 2: Actually do the projectile calculations
         FireProjectile(bulletTrajectory);
@@ -190,15 +178,37 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         nextPatternStartReducingTime = Time.time + recoilPatternContinuousFireWindow;
         nextPatternReduceTime = nextPatternStartReducingTime + recoilPatternRecoveryTime;
         nextPatternResetTime = Time.time + recoilPatternHardResetTime;
-        currAimpointOffset = patternObj.GetAimpointOffsetRotation(currPatternIndex, recoilOffsetBaseScaleFactor * (1 + (movementRecoilMagnitudeScaleFactor * movementSpeed))) * currAimpointOffset;
-        if (Quaternion.Angle(currAimpointOffset, Quaternion.identity) > maxRecoilOffsetAngle) {
-            currAimpointOffset = Quaternion.RotateTowards(currAimpointOffset, Quaternion.identity, Quaternion.Angle(currAimpointOffset, Quaternion.identity) - maxRecoilOffsetAngle);
-        }
+        ApplyRecoil(movementSpeed);
         currAddititonalInaccuracy += recoilInaccuracyAddAmount;
         currPatternIndex++;
 
         //DONE!
         return currPatternIndex;
+    }
+
+    private void ApplyRecoil(float movementSpeed) {
+        float magnitudeScaling = recoilOffsetBaseScaleFactor * (1 + (movementRecoilMagnitudeScaleFactor * movementSpeed));
+        float randomnessDegrees = baseRecoilDirectionRandomness * (1 + (movementRecoilDirectionRandomnessScaleFactor * movementSpeed));
+
+        currAimpointOffset = patternObj.GetAimpointOffsetRotation(currPatternIndex, magnitudeScaling, randomnessDegrees) * currAimpointOffset;
+
+        if (Quaternion.Angle(currAimpointOffset, Quaternion.identity) > maxRecoilOffsetAngle) {
+            currAimpointOffset = Quaternion.RotateTowards(currAimpointOffset, Quaternion.identity, Quaternion.Angle(currAimpointOffset, Quaternion.identity) - maxRecoilOffsetAngle);
+        }
+    }
+
+    private Vector3 ApplyInaccuracy_WorldSpaceRelative(Vector3 worldSpaceRelativeForwardTrajectory, float movementSpeed) {
+        // To gerenate some inaccuracy, we will not generate a random 'rotation', but instead start with a forward facing vector and
+        // add to it some random x and y direction, scaled by the inaccuracy. This has the benefit of biasing the randomness sllightly towards
+        // the centre of the 'circle', and is also mathematically simpler than applying tons of random rotations in Quaternion form.
+        
+        /* NOTE: THIS APPLIES INACCURACY REALTIVE TO WORLD SPACE 'FORWARD' (Z-Axis) Direction!! The resulting inaccurate vector must then be rotated by the muzzle's transform.rotation to align it
+         *       with the aiming direction! */
+        if (currAddititonalInaccuracy + baseInaccuracyDegrees > maxUnscaledInaccuracyDegrees) { currAddititonalInaccuracy = maxUnscaledInaccuracyDegrees - baseInaccuracyDegrees; }
+        float inaccDeg = (baseInaccuracyDegrees + currAddititonalInaccuracy) * (1 + (movementInaccuracyScaleFactor * movementSpeed));
+        inaccDeg = (inaccDeg > maxScaledInaccuracyDegrees) ? maxScaledInaccuracyDegrees : inaccDeg;
+        Vector2 randcomponent = UnityEngine.Random.insideUnitCircle * inaccDeg;  // Random point inside circle where radius rep's angle
+        return Quaternion.Euler(randcomponent.x, randcomponent.y, 0f) * worldSpaceRelativeForwardTrajectory;
     }
 
     private void FireProjectile(Vector3 trajectory) {

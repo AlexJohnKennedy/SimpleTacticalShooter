@@ -363,7 +363,7 @@ MonoBehaviour:
   recoilInaccuracyAddAmount: 0.2
   inaccuracyRecoveryRate: 0.9
   recoilOffsetBaseScaleFactor: 1
-  baseRecoilDirectionRandomness: 0
+  baseRecoilDirectionRandomness: 1
   maxRecoilOffsetAngle: 30
   movementRecoilMagnitudeScaleFactor: 1
   movementRecoilDirectionRandomnessScaleFactor: 1

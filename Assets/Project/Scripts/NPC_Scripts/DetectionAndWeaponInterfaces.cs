@@ -25,4 +25,5 @@ public interface IGunMechanics {
 public interface IRecoilPattern {
     Quaternion GetAimpointOffsetRotation(int shotInPattern);     // gets the offset rotation for the 'nth' shot in the recoil pattern.
     Quaternion GetAimpointOffsetRotation(int shotInPattern, float scaleFactor);     // gets the offset, but scales the magnitude of the recoil rotation.
+    Quaternion GetAimpointOffsetRotation(int shotInPattern, float scaleFactor, float directionRandomnessRangeDegrees);
 }
