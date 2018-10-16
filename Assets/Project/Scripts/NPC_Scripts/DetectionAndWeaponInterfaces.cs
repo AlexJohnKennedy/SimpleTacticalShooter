@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 
 public interface ICharacterDetector {
-    event EventHandler<List<Collider>> VisionUpdatedEvent;
+    event EventHandler<List<TargetInformation>> VisionUpdatedEvent;
 }
 
 public interface IGunMechanics {
@@ -24,7 +24,17 @@ public interface IGunMechanics {
 }
 
 public interface IRecoilPattern {
-    Quaternion GetAimpointOffsetRotation(int shotInPattern);     // gets the offset rotation for the 'nth' shot in the recoil pattern.
+    Quaternion GetAimpointOffsetRotation(int shotInPattern);                        // gets the offset rotation for the 'nth' shot in the recoil pattern.
     Quaternion GetAimpointOffsetRotation(int shotInPattern, float scaleFactor);     // gets the offset, but scales the magnitude of the recoil rotation.
     Quaternion GetAimpointOffsetRotation(int shotInPattern, float scaleFactor, float directionRandomnessRangeDegrees);
+}
+
+public class TargetInformation {
+    public Collider collider;
+    public Vector3 aimPosition;    // Position that is the estimated centre of the visible part of the target collider
+
+    public TargetInformation(Collider collider, Vector3 centralVisiblePoint) {
+        this.collider = collider;
+        this.aimPosition = centralVisiblePoint;
+    }
 }

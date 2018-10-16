@@ -25,8 +25,8 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
     private NavMeshAgent agent;
     private ICharacterDetector perception;
     private IGunMechanics gun;
-    private Collider newTarget;    // Used so we continue shooting at old target, if we are 'reacting' to a new target.
-    private Collider currentTarget;
+    private TargetInformation newTarget;    // Used so we continue shooting at old target, if we are 'reacting' to a new target.
+    private TargetInformation currentTarget;
 
     private float nextShootTime;
     private float nextReactTime;
@@ -58,11 +58,11 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         }
 
         // If we have a target, then rather than just walking around, we should lookat, and shoot at, our target!
-        if (currentTarget) {
+        if (currentTarget != null) {
             AimTowardsTarget(currentTarget);
             
             // If the target is further away than the stand still threshold, then we should stop moving to aim carefully!
-            if (Vector3.Distance(transform.position, currentTarget.transform.position) > standStillThreshold) {
+            if (Vector3.Distance(transform.position, currentTarget.collider.transform.position) > standStillThreshold) {
                 agent.isStopped = true;  // Pause the agent's path.
             }
             else {
@@ -78,9 +78,9 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
 	}
 
     // Function to define how quickly the unity will aim towards the target.
-    private void AimTowardsTarget(Collider target) {
+    private void AimTowardsTarget(TargetInformation target) {
         agent.updateRotation = false;
-        Vector3 targetDirection = target.bounds.center - characterBody.transform.position; //Points towards the target directly.
+        Vector3 targetDirection = target.aimPosition - characterBody.transform.position; //Points towards the target directly.
 
         // Get a rotation which points in the target direction
         Quaternion pointsToTarget = Quaternion.LookRotation(targetDirection);   // Default upwards direction is Vector3.Up
@@ -97,7 +97,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
             float interpFactor = Mathf.SmoothDampAngle(angleDelta, 0.0f, ref currBodyAngularVelocity, timeToAimSeconds, maxTurningSpeedWhileAiming);
             interpFactor = 1.0f - interpFactor / angleDelta;
             characterBody.transform.rotation = Quaternion.Slerp(characterBody.transform.rotation, pointsToTargetNoVertical, interpFactor);  // Rotate character body
-            gun.AimAtTarget(target.bounds.center, interpFactor);
+            gun.AimAtTarget(target.aimPosition, interpFactor);
         }
     }
 
@@ -120,7 +120,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         }
     }
 
-    private void AttemptToShoot(Collider target) {
+    private void AttemptToShoot(TargetInformation target) {
         //Shoot at a target if we are looking sufficiently 'close' to the point, and if our 'next shoot time' has been reached.
         if (CheckAimAngle(target) < aimAngleThreshold_Degrees && Time.time >= nextShootTime && gun.CanFireAgain()) {
             // Shoot at that boy!
@@ -140,9 +140,9 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         }
     }
 
-    private float CheckAimAngle(Collider target) {
+    private float CheckAimAngle(TargetInformation target) {
         //Calculate the angle between our left right orientation, and our target.
-        Vector3 pointsToTarget = target.transform.position - transform.position;
+        Vector3 pointsToTarget = target.aimPosition - transform.position;
         pointsToTarget.y = 0;   //Remove the vertical component.
 
         Vector3 forwardNoVertical = characterBody.transform.forward;
@@ -153,15 +153,15 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
     }
 
     // Handler logic - will be invoked every time we get new information about what characters we can see.
-    private void HandleNewPerception(object sender, List<Collider> visibleColliders) {
+    private void HandleNewPerception(object sender, List<TargetInformation> visibleColliders) {
         // Treat all visible characters as enemies. 
         // Target the nearest visible character.
         if (visibleColliders.Count > 0) {
-            Collider closest = visibleColliders[0];
-            float currDist = Vector3.Distance(transform.position, closest.transform.position);
+            TargetInformation closest = visibleColliders[0];
+            float currDist = Vector3.Distance(transform.position, closest.collider.transform.position);
             visibleColliders.RemoveAt(0);
-            foreach(Collider c in visibleColliders) {
-                float d = Vector3.Distance(transform.position, c.transform.position);
+            foreach(TargetInformation c in visibleColliders) {
+                float d = Vector3.Distance(transform.position, c.collider.transform.position);
                 if (d < currDist) {
                     currDist = d;
                     closest = c;
@@ -175,19 +175,24 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
     }
 
     // Keeps the 'current target' variable up to date, and also checks whether or not the target aquired was a new one.
-    private void UpdateTargetCollider(Collider c) {
+    private void UpdateTargetCollider(TargetInformation c) {
         if (c == null) return;
-        if (currentTarget != c) {
+        if (currentTarget == null || currentTarget.collider != c.collider) {
             // The new target is not the same as the current target!
             // If we aren't already reacting to this target, then we need to set up a 'reaction' timer for it.
-            if (newTarget != c) {
+            if (newTarget == null || newTarget.collider != c.collider) {
                 newTarget = c;
                 reacting = true;
                 nextReactTime = Time.time + reactionTime;
             }
+            else if (newTarget.collider == c.collider) {
+                // Need to update the aim point!
+                newTarget.aimPosition = c.aimPosition;
+            }
         }
-        else {
-            // The target is the same one. No need to do anything...
+        else if (currentTarget.collider == c.collider) {
+            // Need to update the aim point!
+            currentTarget.aimPosition = c.aimPosition;
         }
     }
 }

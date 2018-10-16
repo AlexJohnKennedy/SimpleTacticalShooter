@@ -16,7 +16,7 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
     public int numVerticalChecks;
 
     [HideInInspector]
-    public event EventHandler<List<Collider>> VisionUpdatedEvent;   // Interested parties can receive updates when we do vision updates.
+    public event EventHandler<List<TargetInformation>> VisionUpdatedEvent;   // Interested parties can receive updates when we do vision updates.
 
     private List<Collider> selfColliders;
     private float nextCheckTime;
@@ -39,11 +39,11 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
         if (Time.time >= nextCheckTime) {
             nextCheckTime = Time.time + checkFrequencySeconds;
 
-            List<Collider> visibleCharacterColliders = new List<Collider>();
+            List<TargetInformation> visibleCharacterColliders = new List<TargetInformation>();
             // Find all colliders in the character layer that are within the search radius of us!
             foreach (Collider potentialTarget in Physics.OverlapSphere(transform.position, maxVisionDistance, characterLayerMask, QueryTriggerInteraction.Ignore)) {
                 if (!selfColliders.Contains(potentialTarget) && CanSee(potentialTarget)) {
-                    visibleCharacterColliders.Add(potentialTarget);
+                    visibleCharacterColliders.Add(new TargetInformation(potentialTarget, potentialTarget.bounds.center));
                 }
             }
 
