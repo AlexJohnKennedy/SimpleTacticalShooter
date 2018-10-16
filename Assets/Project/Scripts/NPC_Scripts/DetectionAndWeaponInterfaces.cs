@@ -16,6 +16,7 @@ public interface IGunMechanics {
     bool AimTowards(Vector3 position);
     bool AimInDirection(Vector3 direction, Func<Vector3, Vector3> interpolationFunction);   //Version which allows you to pass is a function which will handle interpolation of aim direction
     bool AimTowards(Vector3 position, Func<Vector3,Vector3> interpolationFunction);         //Version which allows you to pass in a function which will handle interpolation of aim position
+    bool AimAtTarget(Vector3 targetPosition, float angularInterpolationFactor);
 
     //AIMING AND SHOOTING IN ONE CALL - Usually better to handle aiming and firing separately
     int ShootInDirection(Vector3 direction, float movementSpeed);   //Possibly should pass in a handler for hit info?

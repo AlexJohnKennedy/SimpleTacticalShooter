@@ -136,12 +136,14 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
     public bool AimInDirection(Vector3 direction) {
         // Rotate the pivot point to point in the direction given
-        pivotPoint.forward = direction;
+        // DebuggingHelpers.Log(direction);
+        pivotPoint.rotation = Quaternion.LookRotation(direction);
         return true;
     }
 
     public bool AimInDirection(Vector3 direction, Func<Vector3, Vector3> interpolationFunction) {
-        throw new NotImplementedException();
+        pivotPoint.rotation = Quaternion.LookRotation(interpolationFunction(direction));
+        return true;
     }
 
     public bool AimTowards(Vector3 position) {
@@ -150,7 +152,18 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     }
 
     public bool AimTowards(Vector3 position, Func<Vector3, Vector3> interpolationFunction) {
-        throw new NotImplementedException();
+        pivotPoint.LookAt(interpolationFunction(position));
+        return true;
+    }
+
+    public bool AimAtTarget(Vector3 targetPosition, float angularInterpolationFactor) {
+        Vector3 targetDirection = targetPosition - pivotPoint.position;
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
+        // Spherically interpolate the angle
+        pivotPoint.rotation = Quaternion.Slerp(pivotPoint.rotation, targetRotation, angularInterpolationFactor);
+
+        return true;
     }
 
     public bool CanFireAgain() {

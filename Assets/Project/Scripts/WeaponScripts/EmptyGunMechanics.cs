@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EmptyGunMechanics : MonoBehaviour, IGunMechanics {
+    public bool AimAtTarget(Vector3 targetPosition, float angularInterpolationFactor) {
+        return false;
+    }
+
     public bool AimInDirection(Vector3 direction) {
         return false;
     }

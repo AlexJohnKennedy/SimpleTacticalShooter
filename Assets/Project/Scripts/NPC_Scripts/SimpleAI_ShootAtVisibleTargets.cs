@@ -80,7 +80,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
     // Function to define how quickly the unity will aim towards the target.
     private void AimTowardsTarget(Collider target) {
         agent.updateRotation = false;
-        Vector3 targetDirection = target.transform.position - characterBody.transform.position; //Points towards the target directly.
+        Vector3 targetDirection = target.bounds.center - characterBody.transform.position; //Points towards the target directly.
 
         // Get a rotation which points in the target direction
         Quaternion pointsToTarget = Quaternion.LookRotation(targetDirection);   // Default upwards direction is Vector3.Up
@@ -96,8 +96,8 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         if (angleDelta > 0.0f) {
             float interpFactor = Mathf.SmoothDampAngle(angleDelta, 0.0f, ref currBodyAngularVelocity, timeToAimSeconds, maxTurningSpeedWhileAiming);
             interpFactor = 1.0f - interpFactor / angleDelta;
-            characterBody.transform.rotation = Quaternion.Slerp(characterBody.transform.rotation, pointsToTargetNoVertical, interpFactor);  // Rotate character body.
-            //gun.AimInDirection(Quaternion.Slerp(characterBody.transform.rotation, pointsToTarget, interpFactor) * characterBody.transform.forward); //Note that Quat * Vector is NOT commutative (vector * Quat fails)
+            characterBody.transform.rotation = Quaternion.Slerp(characterBody.transform.rotation, pointsToTargetNoVertical, interpFactor);  // Rotate character body
+            gun.AimAtTarget(target.bounds.center, interpFactor);
         }
     }
 
