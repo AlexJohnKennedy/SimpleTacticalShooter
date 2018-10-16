@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using HelperFunctions;
 
 public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
@@ -47,7 +48,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
     [Header("Recoil and recoil pattern settings")]
 
-    [Tooltip("Factor for scaling the magnitude of the recoil pattern")]
+    [Tooltip("Factor for scaling the magnitude of the recoil pattern offsets")]
     public float recoilOffsetBaseScaleFactor;
     [Tooltip("Base randomness (Degrees) to add to each recoil offset direction angle")]
     public float baseRecoilDirectionRandomness;
@@ -59,7 +60,9 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     public float movementRecoilDirectionRandomnessScaleFactor;
     [Tooltip("How quickly the recoil-aimpoint-offset reduces back to zero, in degrees per second")]
     public float recoilRecoveryRate;
-    [Tooltip("How long it takes to step back one 'shot' in the recoil pattern")]
+    [Tooltip("How long the gun has to wait after firing until the recoil pattern starts to recover. This should generally by at least as long as the fire-rate interval, or else recoil pattern recovery may be inconsistent")]
+    public float recoilPatternContinuousFireWindow;
+    [Tooltip("How long it takes to step back one 'shot' in the recoil pattern, once the gun has not been fired for at least recoil-pattern-continuous-fire-window seconds")]
     public float recoilPatternRecoveryTime;
     [Tooltip("How long it takes to 'hard reset' back to the start of the recoil pattern, no matter where you were in the pattern")]
     public float recoilPatternHardResetTime;
@@ -71,6 +74,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
     private int currPatternIndex;               // Which 'shot' we are up to in the pattern.
 
     // Timers
+    private float nextPatternStartReducingTime;
     private float nextPatternReduceTime;
     private float nextPatternResetTime;
     private float nextFireAgainTime;
@@ -80,7 +84,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
         currAddititonalInaccuracy = 0f;
         currAimpointOffset = Quaternion.identity;   // No offset!
         currPatternIndex = 0;
-        nextPatternResetTime = nextPatternReduceTime = nextFireAgainTime = Time.time;
+        nextPatternResetTime = nextPatternReduceTime = nextFireAgainTime = nextPatternStartReducingTime = Time.time;
         patternObj = new NoRecoilPattern();
     }
 
@@ -109,8 +113,9 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
             if (Time.time > nextPatternResetTime) {
                 currPatternIndex = 0;
             }
-            else {
-                // Keep reducing the pattern count accordingly to how much time has passed.
+            else if (Time.time > nextPatternStartReducingTime) {
+                // Keep reducing the pattern count accordingly to how much time has passed, past the start reducing time.
+                nextPatternReduceTime = nextPatternStartReducingTime + recoilPatternRecoveryTime;
                 while (Time.time >= nextPatternReduceTime && currPatternIndex > 0) {
                     currPatternIndex -= 1;
 
@@ -173,7 +178,7 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
         // Step 3: Update timers, update recoil offsets, update the additional inaccuracy, and update the current pattern index
         nextFireAgainTime = Time.time + fireRate_waitTime;
-        nextPatternReduceTime = Time.time + recoilPatternRecoveryTime;
+        nextPatternStartReducingTime = Time.time + recoilPatternContinuousFireWindow;
         nextPatternResetTime = Time.time + recoilPatternHardResetTime;
         currAimpointOffset = patternObj.GetAimpointOffsetRotation(currPatternIndex, recoilOffsetBaseScaleFactor * (1 + (movementRecoilMagnitudeScaleFactor * movementSpeed))) * currAimpointOffset;
         if (Quaternion.Angle(currAimpointOffset, Quaternion.identity) > maxRecoilOffsetAngle) {
@@ -188,7 +193,8 @@ public class BasicRifleMechanics : MonoBehaviour, IGunMechanics {
 
     private void FireProjectile(Vector3 trajectory) {
         // DEBUG
-        Debug.DrawRay(muzzlePoint.position, trajectory * 100, Color.yellow);
+        DebuggingHelpers.DrawRay(muzzlePoint.position, trajectory * 100, Color.yellow);
+        DebuggingHelpers.Log("FIRING GUN: Recoil pattern is " + currPatternIndex);
 
         // Simply fire a ray out of the muzzle, in the trajectory direction.
         Ray bulletRay = new Ray(muzzlePoint.position, trajectory);

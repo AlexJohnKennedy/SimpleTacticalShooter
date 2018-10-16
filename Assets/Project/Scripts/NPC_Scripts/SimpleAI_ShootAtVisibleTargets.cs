@@ -125,7 +125,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
 
             // Reset shooting wait timer.
             System.Random rand = new System.Random();
-            if (patternIndex > maxBurstSize + rand.Next(-maxBurstSizeRandomRange, maxBurstSizeRandomRange)) {
+            if (patternIndex >= maxBurstSize + rand.Next(-maxBurstSizeRandomRange, maxBurstSizeRandomRange)) {
                 nextShootTime = Time.time + recoilRecoveryWaitIntervalSeconds;
             }
             else if (agent.velocity.magnitude > 0.1f) {

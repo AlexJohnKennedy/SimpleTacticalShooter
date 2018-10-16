@@ -41,6 +41,16 @@ namespace HelperFunctions {
             if (!showDebugging) return;
             Debug.DrawLine(from, to, c, duration);
         }
+
+        public static void DrawRay(Vector3 from, Vector3 dist, Color c, float duration = 0.0f) {
+            if (!showDebugging) return;
+            Debug.DrawRay(from, dist, c, duration);
+        }
+
+        public static void Log(object msg) {
+            if (!showDebugging) return;
+            Debug.Log(msg);
+        }
     }
 }
 
