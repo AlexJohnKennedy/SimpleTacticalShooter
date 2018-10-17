@@ -55,7 +55,8 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
     private bool CanSee(Collider target) {
         // DebuggingHelpers.DrawAxisAlignedBoundingBox(target.bounds, Color.cyan);
 
-        if (LineCastCheck(target, target.transform.position)) { return true; }
+        // Preliminary simple check to save grid spacing calculations if the target is obviously visible.
+        if (LineCastCheck(target, target.bounds.center)) { return true; }
 
         // Perform a 'numHorizontalChecks' by 'numVerticalChecks' number of line casts to try to see the character in the case he is partially obscured
         // First, figure out the maximum 'width' of where the target could be, as the widest range to be the hypotenuse of the Axis-aligned-bounding-box of the target collider.
@@ -73,8 +74,6 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
 
         // Start at the 'top right' of the checking grid.
         Vector3 pointToCheck = target.bounds.center - (horizontalOffsetDirection * (width * 0.95f / 2)) - (verticalOffsetDirection * (height * 0.95f / 2));
-
-        if (LineCastCheck(target, pointToCheck)) { return true; }
 
         for (int i=0; i < numVerticalChecks; i++) {
             for (int j=0; j < numHorizontalChecks; j++) {
@@ -95,13 +94,15 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
 
     private bool LineCastCheck(Collider target, Vector3 point) {
         RaycastHit hitInfo;
-        // DebuggingHelpers.DrawLine(eyesPosition.position, point, Color.red);
+        
         if (Physics.Linecast(eyesPosition.position, point, out hitInfo, sightLayerMask, QueryTriggerInteraction.Ignore)) {
             if (hitInfo.transform == target.transform) {
                 // We can see the target!
+                // DebuggingHelpers.DrawLine(eyesPosition.position, point, Color.green);
                 return true;
             }
         }
+        // DebuggingHelpers.DrawLine(eyesPosition.position, point, Color.red);
         return false;
     }
 }

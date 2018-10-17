@@ -326,11 +326,11 @@ GameObject:
   - component: {fileID: 24006190}
   - component: {fileID: 24006189}
   - component: {fileID: 24006188}
-  - component: {fileID: 24006187}
   - component: {fileID: 24006186}
   - component: {fileID: 24006185}
   - component: {fileID: 24006184}
   - component: {fileID: 24006183}
+  - component: {fileID: 24006187}
   m_Layer: 9
   m_Name: NPC (1)
   m_TagString: Untagged
@@ -362,7 +362,7 @@ MonoBehaviour:
   movementInaccuracyScaleFactor: 3.5
   recoilInaccuracyAddAmount: 0.2
   inaccuracyRecoveryRate: 0.9
-  recoilOffsetBaseScaleFactor: 1
+  recoilOffsetBaseScaleFactor: 0
   baseRecoilDirectionRandomness: 0.7
   maxRecoilOffsetAngle: 30
   movementRecoilMagnitudeScaleFactor: 1
@@ -424,7 +424,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 24006182}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54ea4361c75ce9446ad316d21ebe0dbe, type: 3}
+  m_Script: {fileID: 11500000, guid: edeb2969b67eeea4bbcfd2d7d45441c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   characterLayerMask:
@@ -438,6 +438,7 @@ MonoBehaviour:
   eyesPosition: {fileID: 1815467265}
   numHorizontalChecks: 5
   numVerticalChecks: 10
+  showingCorners: 1
 --- !u!136 &24006188
 CapsuleCollider:
   m_ObjectHideFlags: 0
