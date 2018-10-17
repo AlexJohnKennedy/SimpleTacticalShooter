@@ -362,7 +362,7 @@ MonoBehaviour:
   movementInaccuracyScaleFactor: 3.5
   recoilInaccuracyAddAmount: 0.2
   inaccuracyRecoveryRate: 0.9
-  recoilOffsetBaseScaleFactor: 1
+  recoilOffsetBaseScaleFactor: 0.7
   baseRecoilDirectionRandomness: 0.7
   maxRecoilOffsetAngle: 30
   movementRecoilMagnitudeScaleFactor: 1
@@ -4014,7 +4014,7 @@ MonoBehaviour:
   movementInaccuracyScaleFactor: 3.5
   recoilInaccuracyAddAmount: 0.2
   inaccuracyRecoveryRate: 0.9
-  recoilOffsetBaseScaleFactor: 1
+  recoilOffsetBaseScaleFactor: 0.7
   baseRecoilDirectionRandomness: 0.7
   maxRecoilOffsetAngle: 30
   movementRecoilMagnitudeScaleFactor: 1
