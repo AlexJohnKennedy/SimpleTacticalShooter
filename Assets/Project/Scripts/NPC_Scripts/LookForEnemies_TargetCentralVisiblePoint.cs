@@ -58,7 +58,7 @@ public class LookForEnemies_TargetCentralVisiblePoint : MonoBehaviour, ICharacte
     // of 'hits' in the linecast grid, and then taking the central point of those points as the aim point. Then, we return target info with that 
     // data attached.
     private TargetInformation CalculateTargetInfo(Collider target) {
-        DebuggingHelpers.DrawAxisAlignedBoundingBox(target.bounds, Color.cyan);
+        // DebuggingHelpers.DrawAxisAlignedBoundingBox(target.bounds, Color.cyan);
 
         // Perform a 'numHorizontalChecks' by 'numVerticalChecks' number of line casts to try to see the character in the case he is partially obscured
         // First, figure out the maximum 'width' of where the target could be, as the widest range to be the hypotenuse of the Axis-aligned-bounding-box of the target collider.
