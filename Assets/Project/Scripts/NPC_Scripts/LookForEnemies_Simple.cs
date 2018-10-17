@@ -69,8 +69,8 @@ public class LookForEnemies_Simple : MonoBehaviour, ICharacterDetector {
         // Find a normalised vector perpendicular to the line between us and the target, which is also perpendiculr to vertical (parallel to the ground).
         Vector3 horizontalOffsetDirection = Vector3.Cross(target.transform.position - eyesPosition.position, Vector3.up).normalized;
 
-        // Find a normalised vector perpendicular to the line between us and the target, which is also perpendicular to the ground (parallel to vertical).
-        Vector3 verticalOffsetDirection = Vector3.Cross(target.transform.position - eyesPosition.position, Vector3.right).normalized;
+        // Vertical offset direction should alsways be considered as straight up.
+        Vector3 verticalOffsetDirection = Vector3.up;
 
         // Start at the 'top right' of the checking grid.
         Vector3 pointToCheck = target.bounds.center - (horizontalOffsetDirection * (width * 0.95f / 2)) - (verticalOffsetDirection * (height * 0.95f / 2));
