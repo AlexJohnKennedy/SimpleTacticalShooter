@@ -48,7 +48,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
         gun = GetComponent<IGunMechanics>();
         agent = GetComponent<NavMeshAgent>();
         currentTarget = newTarget = null;   // Need to acquire a target(s) first.
-        reacting = true;
+        reacting = false;
         nextShootTime = Time.time;  // Can fire right away!
         currBodyAngularVelocity = 0f;
     }
