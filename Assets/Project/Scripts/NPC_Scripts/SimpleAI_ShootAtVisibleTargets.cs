@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+/** TODO: Replace 'orders' system so that there is a maintained STACK of "orders" or "priority actions" to handle whether or not the AI should stop and shoot,
+ * keep walking, or whatever. At the moment it's just a bunch of fiddly update logic which will become super buggy and hard to maintain if you want to add complexity
+ * (e.g. you can do attack-move, or just 'move' commands separately, in future). 
+ */
+
 [RequireComponent(typeof(NavMeshAgent))]    // The AI script needs to be able to command the agent controller, to move the Agent.
 [RequireComponent(typeof(ICharacterDetector))]    // The AI script will want to listen for vision events, so it knows what the agent can 'see'.
 [RequireComponent(typeof(IGunMechanics))]         // The AI script will want to be able to fire it's gun.
@@ -27,6 +32,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
     private IGunMechanics gun;
     private TargetInformation newTarget;    // Used so we continue shooting at old target, if we are 'reacting' to a new target.
     private TargetInformation currentTarget;
+    private float prevTargetDistance;
 
     private float nextShootTime;
     private float nextReactTime;
@@ -55,17 +61,24 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
             reacting = false;
             currentTarget = newTarget;
             newTarget = null;
+
+            // If the target is further away than the stand still threshold, then we should stop moving to aim carefully!
+            prevTargetDistance = Vector3.Distance(transform.position, currentTarget.collider.transform.position);
+            if (prevTargetDistance > standStillThreshold) {
+                agent.isStopped = true;  // Pause the agent's path.
+            }
         }
 
         // If we have a target, then rather than just walking around, we should lookat, and shoot at, our target!
         if (currentTarget != null) {
             AimTowardsTarget(currentTarget);
-            
-            // If the target is further away than the stand still threshold, then we should stop moving to aim carefully!
-            if (Vector3.Distance(transform.position, currentTarget.collider.transform.position) > standStillThreshold) {
+
+            // If the target was previously inside our distance threshold, and just moved outside of it this tick, then we should stop moving and aim carefully.
+            float currDist = Vector3.Distance(transform.position, currentTarget.collider.transform.position);
+            if (prevTargetDistance <= standStillThreshold && currDist > standStillThreshold) {
                 agent.isStopped = true;  // Pause the agent's path.
             }
-            else {
+            else if (currDist < standStillThreshold) {
                 agent.isStopped = false; // Resume walking if the target get's too close!
             }
 

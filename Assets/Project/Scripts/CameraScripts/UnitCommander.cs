@@ -24,6 +24,7 @@ public class UnitCommander : MonoBehaviour {
             RaycastHit hitInfo;
             if (Physics.Raycast(ray, out hitInfo) && hitInfo.collider.gameObject.GetComponent<NavMeshAgent>() == null) {
                 currentlySelectedAgent.SetDestination(hitInfo.point);
+                currentlySelectedAgent.isStopped = false;   // Overwrite a stopped unit (to be able to move the unit again)
             }
         }
 	}
