@@ -51,7 +51,6 @@ public class AreaNodeVisualisation : MonoBehaviour {
     public AreaNodeManager.AreaNodeVisualisationStates CurrentState {
         get { return CurrentState; }
         set {
-            CurrentState = value;
             if (value == AreaNodeManager.AreaNodeVisualisationStates.MAIN_AGENT_IN_AREA) { meshRenderer.material = mainAgentInAreaMaterial; }
             else if (value == AreaNodeManager.AreaNodeVisualisationStates.COMBAT_CONTACT) { meshRenderer.material = combatContactMaterial; }
             else if (value == AreaNodeManager.AreaNodeVisualisationStates.CONFIRMED_ENEMIES) { meshRenderer.material = confirmedEnemiesMaterial; }
