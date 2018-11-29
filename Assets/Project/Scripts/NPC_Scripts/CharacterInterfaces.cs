@@ -44,4 +44,6 @@ public interface ICharacterAwarenessState {
     // Specifies controls for parameterising and manipulating aspects of the character's awareness ('mental state') logic. 
     // Note that this is mainly for commanding, not listening to changes. The character mental states are communicated through
     // an event driven system which is listened to through the IPerceptionEventInvoker interface.
+
+    // UNUSED FOR NOW.
 }
