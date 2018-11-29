@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshCollider))]
 [RequireComponent(typeof(MeshRenderer))]
-public class AreaNodeVisualisationController : MonoBehaviour {
+public class AreaNodeVisualisation : MonoBehaviour {
 
     [Header("Define the position of each corner of the area, and the height")]
     [Tooltip("A transform which has the position of the first corner of the area, on the floor")]
@@ -20,13 +20,32 @@ public class AreaNodeVisualisationController : MonoBehaviour {
     public float areaTopYValue;
 
     [Header("Materials for defining the colour/look of the visualisation for each 'area state'")]
-    [Tooltip("Default Material")]
-    public Material defaultMaterial;
+    [Tooltip("Material for when the 'Main' Agent character enters this zone")]
+    public Material mainAgentInAreaMaterial;
+    [Tooltip("Enemy agent character is known to be in this area")]
+    public Material confirmedEnemiesMaterial;
+    [Tooltip("Material for contact with enemies area (Direct combat engagement)")]
+    public Material combatContactMaterial;
+    [Tooltip("Material for when known enemies could reach this area without the main agent seeing them do so")]
+    public Material enemyControlledMaterial;
+    [Tooltip("Material for when there is the potential for enemies or danger in the area, but is unknown")]
+    public Material uncontrolledAreaMaterial;
+    [Tooltip("Immediate Danger in this area")]
+    public Material dangerAreaMaterial;
+    [Tooltip("Material for areas which are directly controlled by friendly agents")]
+    public Material controlledAreaMaterial;
 
     // Private fields
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
     private MeshRenderer meshRenderer;
+
+    private List<GameObject> agentsInZone; // This area node visualiser will maintain a collection of all the characters which are inside this area.
+
+    private void Awake() {
+        // Gain access to the game controller in the scene, so that we can get the area node manager and register to it.
+        GameObject.FindGameObjectWithTag("GameController").GetComponent<AreaNodeManager>().RegisterAreaNode(this);
+    }
 
     // Use this for initialization
     void Start () {
@@ -36,7 +55,7 @@ public class AreaNodeVisualisationController : MonoBehaviour {
         Mesh mesh = GenerateAreaMesh();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
-        meshRenderer.material = defaultMaterial;
+        meshRenderer.material = uncontrolledAreaMaterial;
     }
 	
 	// Update is called once per frame

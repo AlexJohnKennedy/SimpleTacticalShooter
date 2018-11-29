@@ -30,11 +30,23 @@ public interface IRecoilPattern {
 }
 
 public class TargetInformation {
+    public bool IsCharacter { get; }
+
+    public ICharacter character;
     public Collider collider;
     public Vector3 aimPosition;    // Position that is the estimated centre of the visible part of the target collider
 
     public TargetInformation(Collider collider, Vector3 centralVisiblePoint) {
         this.collider = collider;
         this.aimPosition = centralVisiblePoint;
+
+        // We can automatically determine the 'character' object by getting it.
+        character = collider.GetComponent<ICharacter>();
+        if (character == null) {
+            IsCharacter = false;
+        }
+        else {
+            IsCharacter = true;
+        }
     }
 }

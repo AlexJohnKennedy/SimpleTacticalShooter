@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -11,7 +12,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]    // The AI script needs to be able to command the agent controller, to move the Agent.
 [RequireComponent(typeof(ICharacterDetector))]    // The AI script will want to listen for vision events, so it knows what the agent can 'see'.
 [RequireComponent(typeof(IGunMechanics))]         // The AI script will want to be able to fire it's gun.
-public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
+public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour, ICombatAi {
 
     public float standStillThreshold;                   // How far away the target has to be for the AI to stand still to try and shoot.
     public float aimAngleThreshold_Degrees;             // How close our aim point has to be to the target for the AI to try and shoot.
@@ -26,6 +27,10 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour {
     public float maxTurningSpeedWhileAiming;    // Degrees per second, maximum angular velocity for the character while turning. 
 
     public GameObject characterBody;    // The thing which we will rotate (instead of the navagent object)
+
+    // Events which this AI can invoke, to signal to other entities when the AI makes decisions or does something.
+    public event EventHandler<TargetInformation> EnemySpottedEvent;
+    public event EventHandler<TargetInformation> EnemyEngagedEvent;
 
     private NavMeshAgent agent;
     private ICharacterDetector perception;

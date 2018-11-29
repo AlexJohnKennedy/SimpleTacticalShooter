@@ -3,14 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Damageable_EventInvoker))]
-public class NPC_SimpleHealth : MonoBehaviour {
+public class NPC_SimpleHealth : MonoBehaviour, IHealthSystem {
 
     public float maxHealth;
 
     private float currentHealth;
 
-	// Use this for initialization
-	void Start () {
+    public float CurrentHealth {
+        get {
+            return currentHealth;
+        }
+    }
+
+    public float MaxHealth {
+        get {
+            return maxHealth;
+        }
+    }
+
+    // Use this for initialization
+    void Start () {
         GetComponent<Damageable_EventInvoker>().OnHitByProjectile += TakeDamage;
         currentHealth = maxHealth;
 	}
