@@ -69,12 +69,6 @@ public class AreaNodeVisualisation : MonoBehaviour {
     private MeshRenderer meshRenderer;
 
     private void Awake() {
-        // Gain access to the game controller in the scene, so that we can get the area node manager and register to it.
-        GameObject.FindGameObjectWithTag("GameController").GetComponent<AreaNodeManager>().RegisterAreaNode(this);
-    }
-
-    // Use this for initialization
-    void Start () {
         meshFilter = GetComponent<MeshFilter>();
         meshCollider = GetComponent<MeshCollider>();
         meshRenderer = GetComponent<MeshRenderer>();
@@ -85,6 +79,12 @@ public class AreaNodeVisualisation : MonoBehaviour {
         meshRenderer.material = uncontrolledAreaMaterial;
         agentsInZone = new HashSet<ICharacter>();
         CurrentState = AreaNodeManager.AreaNodeVisualisationStates.UNCONTROLLED;
+    }
+
+    // Use this for initialization
+    void Start () {
+        // Gain access to the game controller in the scene, so that we can get the area node manager and register to it.
+        GameObject.FindGameObjectWithTag("GameController").GetComponent<AreaNodeManager>().RegisterAreaNode(this);
     }
 
     // Define logic for tracking when character objects enter and exit the area.

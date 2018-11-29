@@ -10,8 +10,10 @@ using UnityEngine;
  *  the areaNodeVisualisations to register themselves to THIS object when they initiate (OnAwake). */
 public class AreaNodeManager : MonoBehaviour {
 
-    [Tooltip("Determines from whose perspective the visualisations should be from")]
-    public ICharacter mainCharacter;    // Which perspective should we visualise from?
+    [Header("This object must be an ICharacter, as in have a component attached which implements ICharacter")]
+    [Tooltip("Determines from whose perspective the visualisations should be from. THIS GAMEOBJECT MUST BE AN ICHARACTER!")]
+    public GameObject mainCharacterGameObject;    // Which perspective should we visualise from?
+    private ICharacter mainCharacter;
 
     // In order to highlight things effectively, this will keep a mapping of which area every character is in, and what state that character has with respect to the main character.
     private Dictionary<ICharacter, AreaNodeVisualisation> characterAreaMap;
@@ -47,22 +49,18 @@ public class AreaNodeManager : MonoBehaviour {
         }
 
         // The state of the area the character just left (the sender) should become the highest ranking state of the ones associated to any characters still remaining in the area, else default.
-        AreaNodeVisualisationStates state = AreaNodeVisualisationStates.UNCONTROLLED;
-        foreach (ICharacter c in area.AgentsInZone) {
-            if ((int)characterStateMap[c] >= (int)state) {
-                state = characterStateMap[c];
-            }
-        }
-
-        area.CurrentState = state;
+        UpdateAreaStateBasedOnCharactersWithinIt(area);
     }
 
     private void Awake() {
+        mainCharacter = mainCharacterGameObject.GetComponent<ICharacter>();
         characterAreaMap = new Dictionary<ICharacter, AreaNodeVisualisation>();
         characterStateMap = new Dictionary<ICharacter, AreaNodeVisualisationStates>();
+    }
+    private void Start() {
         // Attain all objects with the character tag in roder to keep track of them.
         GameObject[] objs = GameObject.FindGameObjectsWithTag("Character");
-        for (int i=0; i < objs.Length; i++) {
+        for (int i = 0; i < objs.Length; i++) {
             ICharacter ch = objs[i].GetComponent<ICharacter>();
             if (ch == null) {
                 throw new System.Exception("A GameObject with the tag 'Character' did not have an ICharacter component attached. This is NOT ALLOWED! :O");
@@ -83,10 +81,44 @@ public class AreaNodeManager : MonoBehaviour {
         IPerceptionEventInvoker p = ch.RequestPerceptionEventListeningRights();
 
         // Register our handler delegates.
-        p.EnemyEngagedEvent += 
-        p.EnemyDisengagedEvent +=
-        p.EnemySpottedEvent +=
-        p.EnemyLostEvent += 
+        p.EnemyEngagedEvent += MainCharacterEngagedEnemy;
+        p.EnemyDisengagedEvent += MainCharacterDisengagedEnemy;
+        p.EnemySpottedEvent += MainCharacterSpottedEnemy;
+        p.EnemyLostEvent += MainCharacterLostEnemy;
+    }
+
+    // Handler functions for when our main character percieves things about other characters.
+    private void MainCharacterEngagedEnemy(object sender, ICharacter enemy) {
+        characterStateMap[enemy] = AreaNodeVisualisationStates.COMBAT_CONTACT;
+        UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
+    }
+    private void MainCharacterDisengagedEnemy(object sender, ICharacter enemy) {
+        if (characterStateMap[enemy] == AreaNodeVisualisationStates.COMBAT_CONTACT) {
+            characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
+            UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
+        }
+    }
+    private void MainCharacterSpottedEnemy(object sender, ICharacter enemy) {
+        if ((int)AreaNodeVisualisationStates.CONFIRMED_ENEMIES > (int)characterStateMap[enemy]) {
+            characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
+            UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
+        }
+    }
+    private void MainCharacterLostEnemy(object sender, ICharacter enemy) {
+        characterStateMap[enemy] = AreaNodeVisualisationStates.UNCONTROLLED;
+        UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
+    }
+
+    private void UpdateAreaStateBasedOnCharactersWithinIt(AreaNodeVisualisation area) {
+        AreaNodeVisualisationStates state = AreaNodeVisualisationStates.UNCONTROLLED;
+
+        foreach (ICharacter c in area.AgentsInZone) {
+            if ((int)characterStateMap[c] >= (int)state) {
+                state = characterStateMap[c];
+            }
+        }
+
+        area.CurrentState = state;
     }
 
     // Enumerated possible visualisation states, and their associated priority level. If there is more than one enemy/event in an area, which imply different states, the state with the higher
