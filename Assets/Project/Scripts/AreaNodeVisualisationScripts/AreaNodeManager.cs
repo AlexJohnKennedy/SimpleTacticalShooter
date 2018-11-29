@@ -34,7 +34,7 @@ public class AreaNodeManager : MonoBehaviour {
 
         // Whatever the state of the area the Character was PREVIOUSLY in should become the state of the new area, unless the entered area already has a state which supersedes it.
         AreaNodeVisualisationStates state = characterStateMap[character];
-        if ((int)state >= (int)area.CurrentState) {
+        if (state.Priority() >= area.CurrentState.Priority()) {
             area.CurrentState = state;
         }
  
@@ -99,7 +99,7 @@ public class AreaNodeManager : MonoBehaviour {
         }
     }
     private void MainCharacterSpottedEnemy(object sender, ICharacter enemy) {
-        if ((int)AreaNodeVisualisationStates.CONFIRMED_ENEMIES > (int)characterStateMap[enemy]) {
+        if (AreaNodeVisualisationStates.CONFIRMED_ENEMIES.Priority() > characterStateMap[enemy].Priority()) {
             characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
             UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
         }
@@ -111,26 +111,44 @@ public class AreaNodeManager : MonoBehaviour {
 
     private void UpdateAreaStateBasedOnCharactersWithinIt(AreaNodeVisualisation area) {
         AreaNodeVisualisationStates state = AreaNodeVisualisationStates.UNCONTROLLED;
-
         foreach (ICharacter c in area.AgentsInZone) {
-            if ((int)characterStateMap[c] >= (int)state) {
+            if (characterStateMap[c].Priority() >= state.Priority()) {
                 state = characterStateMap[c];
             }
         }
 
         area.CurrentState = state;
     }
+}
 
-    // Enumerated possible visualisation states, and their associated priority level. If there is more than one enemy/event in an area, which imply different states, the state with the higher
-    // priority will supersede, and be the one displayed.
-    public enum AreaNodeVisualisationStates {
-        MAIN_AGENT_IN_AREA = 4,
-        CONFIRMED_ENEMIES = 2,
-        COMBAT_CONTACT= 3,
-        ENEMY_CONTROLLED = 1,
-        UNCONTROLLED = 1,
-        DANGER = 1,
-        CONTROLLED = 1,
-        NULL = -1
+
+// Enumerated possible visualisation states. If there is more than one enemy/event in an area, which imply different states, the state with the higher
+// priority will supersede, and be the one displayed. The priority level is defined in the constant array below, and an extension method to the enum
+// is used to aquire the priority level.
+public enum AreaNodeVisualisationStates {
+    MAIN_AGENT_IN_AREA = 0,
+    CONFIRMED_ENEMIES = 1,
+    COMBAT_CONTACT = 2,
+    ENEMY_CONTROLLED = 3,
+    UNCONTROLLED = 4,
+    DANGER = 5,
+    CONTROLLED = 6,
+    NULL = 7
+}
+/* Priority Levels (match up the enum value as index into the array below)
+MAIN_AGENT_IN_AREA = 4,
+CONFIRMED_ENEMIES = 2,
+COMBAT_CONTACT= 3,
+ENEMY_CONTROLLED = 1,
+UNCONTROLLED = 1,
+DANGER = 1,
+CONTROLLED = 1,
+NULL = -1
+*/
+// Attach an extension method to this enum type, so that we can recieve the priority levels of each state easily.
+public static class VisualisationStateExtensionMehtods {
+    private static readonly int[] nodeStatePriorityLevels = { 4, 2, 3, 1, 1, 1, -1 };
+    public static int Priority(this AreaNodeVisualisationStates s) {
+        return nodeStatePriorityLevels[(int)s];
     }
 }

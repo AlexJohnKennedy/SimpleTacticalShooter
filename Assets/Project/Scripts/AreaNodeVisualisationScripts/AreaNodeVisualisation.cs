@@ -48,16 +48,19 @@ public class AreaNodeVisualisation : MonoBehaviour {
         }
     }
 
-    public AreaNodeManager.AreaNodeVisualisationStates CurrentState {
-        get { return CurrentState; }
+    private AreaNodeVisualisationStates currentState;
+    public AreaNodeVisualisationStates CurrentState {
+        get { return currentState; }
         set {
-            if (value == AreaNodeManager.AreaNodeVisualisationStates.MAIN_AGENT_IN_AREA) { meshRenderer.material = mainAgentInAreaMaterial; }
-            else if (value == AreaNodeManager.AreaNodeVisualisationStates.COMBAT_CONTACT) { meshRenderer.material = combatContactMaterial; }
-            else if (value == AreaNodeManager.AreaNodeVisualisationStates.CONFIRMED_ENEMIES) { meshRenderer.material = confirmedEnemiesMaterial; }
-            else if (value == AreaNodeManager.AreaNodeVisualisationStates.ENEMY_CONTROLLED) { meshRenderer.material = enemyControlledMaterial; }
-            else if (value == AreaNodeManager.AreaNodeVisualisationStates.UNCONTROLLED) { meshRenderer.material = uncontrolledAreaMaterial; }
-            else if (value == AreaNodeManager.AreaNodeVisualisationStates.DANGER) { meshRenderer.material = dangerAreaMaterial; }
-            else if (value == AreaNodeManager.AreaNodeVisualisationStates.CONTROLLED) { meshRenderer.material = controlledAreaMaterial; }
+            currentState = value;
+            Debug.Log("switching to " + value + " (priority of this state is "+value.Priority());
+            if (value == AreaNodeVisualisationStates.MAIN_AGENT_IN_AREA) { meshRenderer.material = mainAgentInAreaMaterial; }
+            else if (value == AreaNodeVisualisationStates.COMBAT_CONTACT) { meshRenderer.material = combatContactMaterial; }
+            else if (value == AreaNodeVisualisationStates.CONFIRMED_ENEMIES) { meshRenderer.material = confirmedEnemiesMaterial; }
+            else if (value == AreaNodeVisualisationStates.ENEMY_CONTROLLED) { meshRenderer.material = enemyControlledMaterial; }
+            else if (value == AreaNodeVisualisationStates.UNCONTROLLED) { meshRenderer.material = uncontrolledAreaMaterial; }
+            else if (value == AreaNodeVisualisationStates.DANGER) { meshRenderer.material = dangerAreaMaterial; }
+            else if (value == AreaNodeVisualisationStates.CONTROLLED) { meshRenderer.material = controlledAreaMaterial; }
             else { throw new System.Exception("Tried to set an AreaNodeVisualisation to a state without a corresponding material update!"); }
         }
     }
@@ -77,7 +80,7 @@ public class AreaNodeVisualisation : MonoBehaviour {
         meshCollider.isTrigger = true;
         meshRenderer.material = uncontrolledAreaMaterial;
         agentsInZone = new HashSet<ICharacter>();
-        CurrentState = AreaNodeManager.AreaNodeVisualisationStates.UNCONTROLLED;
+        CurrentState = AreaNodeVisualisationStates.UNCONTROLLED;
     }
 
     // Use this for initialization
