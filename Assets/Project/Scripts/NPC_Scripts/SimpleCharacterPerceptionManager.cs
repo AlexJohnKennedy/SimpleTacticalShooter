@@ -10,6 +10,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(ICharacterDetector))]
 [RequireComponent(typeof(ICombatAi))]
+[DisallowMultipleComponent]
 public class SimpleCharacterPerceptionManager : MonoBehaviour, IPerceptionEventInvoker, ICharacterAwarenessState {
 
     // Events it can invoke in different situations in order to implement the Perception Event Invoker interface.

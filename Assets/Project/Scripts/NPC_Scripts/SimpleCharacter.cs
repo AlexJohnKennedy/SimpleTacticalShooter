@@ -41,7 +41,11 @@ public class SimpleCharacter : MonoBehaviour, ICharacter {
         if (temp.Length > 1) { throw new System.Exception("Character gameobject had more than one ICharacterAwarenessState component attached! This is not allowed"); }
         characterAwarenessState= (ICharacterAwarenessState)temp[0];
     }
-    
+
+    public IPerceptionEventInvoker RequestPerceptionEventListeningRights() {
+        return perceptionEventInvoker;
+    }
+
     // Use this for initialization
     void Start () {
 		

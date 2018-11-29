@@ -7,7 +7,7 @@ using UnityEngine;
 // An implementation of this interface will be the 'root' object of the collection of objects containing character logic, and should
 // generally just be a 'bag of decomposed interfaces' which are delegated all the more specific parts of character logic.
 public interface ICharacter {
-    
+    IPerceptionEventInvoker RequestPerceptionEventListeningRights();
 }
 
 // Serves as the generic type for instaces which control the Character GameObject (and relevant components) in order to make the character
@@ -26,6 +26,7 @@ public interface IMovementAi {
 public interface IHealthSystem {
     float CurrentHealth { get; }
     float MaxHealth { get;  }
+    event Action<IHealthSystem> DamageTakenEvent;
 }
 
 public interface IPerceptionEventInvoker {

@@ -14,7 +14,7 @@ public class AreaNodeManager : MonoBehaviour {
     public SimpleAI_ShootAtVisibleTargets mainCharacter;    // Which perspective should we visualise from?
 
 
-    private List<AreaNodeVisualisation> areaNodeVisualisations;                                         // Keeps a reference to all areas which register to this manager.
+    private List<AreaNodeVisualisation> areaNodeVisualisations;     // Keeps a reference to all areas which register to this manager.
 
     public void RegisterAreaNode(AreaNodeVisualisation a) {
         if (areaNodeVisualisations == null) { areaNodeVisualisations = new List<AreaNodeVisualisation>(); }

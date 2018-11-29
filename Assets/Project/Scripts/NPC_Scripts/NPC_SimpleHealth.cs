@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Damageable_EventInvoker))]
@@ -21,6 +22,8 @@ public class NPC_SimpleHealth : MonoBehaviour, IHealthSystem {
         }
     }
 
+    public event Action<IHealthSystem> DamageTakenEvent;
+
     // Use this for initialization
     void Start () {
         GetComponent<Damageable_EventInvoker>().OnHitByProjectile += TakeDamage;
@@ -29,6 +32,7 @@ public class NPC_SimpleHealth : MonoBehaviour, IHealthSystem {
 	
 	private void TakeDamage(object projectile, ProjectileHitEventArgs projectileStats) {
         GetComponent<Rigidbody>()?.AddForceAtPosition(projectileStats.forceDirection, projectileStats.hitPosition);
+        DamageTakenEvent?.Invoke(this);
 
         currentHealth -= projectileStats.projectileDamage;
         if (currentHealth <= 0) {
