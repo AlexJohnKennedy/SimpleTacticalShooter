@@ -17624,6 +17624,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b75070abef2733546a9803d5e8e73972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mask:
+    serializedVersion: 2
+    m_Bits: 785
 --- !u!1 &728557976
 GameObject:
   m_ObjectHideFlags: 0
@@ -27833,6 +27836,79 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1149742400}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &1150201857
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4819490887088570, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -1.76
+      objectReference: {fileID: 0}
+    - target: {fileID: 4819490887088570, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 3.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 4819490887088570, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 3.66
+      objectReference: {fileID: 0}
+    - target: {fileID: 4819490887088570, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4819490887088570, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4819490887088570, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4819490887088570, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4819490887088570, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1732145380654962, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+      propertyPath: m_Name
+      value: NPC (Enemy 1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
+  m_IsPrefabAsset: 0
+--- !u!1 &1150201858 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1732145380654962, guid: bb0d013ab39222b4bb2b57d4f75e6c9d,
+    type: 2}
+  m_PrefabInternal: {fileID: 1150201857}
+--- !u!114 &1150201859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1150201858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b7520130cf12ed46aab0be4e9f8c1aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1150201860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1150201858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69e2074581e4c1a408a6502c5d69ef86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1151624208
 GameObject:
   m_ObjectHideFlags: 0
@@ -28357,7 +28433,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1184757441}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: AreaCorner4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32774,7 +32850,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1356808020}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: AreaCorner3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35917,7 +35993,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1517948316}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: AreaCorner1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43379,7 +43455,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1842707294}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: AreaCorner2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48865,7 +48941,7 @@ GameObject:
   - component: {fileID: 2037946864}
   - component: {fileID: 2037946863}
   - component: {fileID: 2037946862}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: AreaNodeVisualisation
   m_TagString: Untagged
   m_Icon: {fileID: 0}

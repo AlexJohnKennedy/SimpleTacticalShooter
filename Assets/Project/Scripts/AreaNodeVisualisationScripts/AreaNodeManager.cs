@@ -147,7 +147,7 @@ NULL = -1
 */
 // Attach an extension method to this enum type, so that we can recieve the priority levels of each state easily.
 public static class VisualisationStateExtensionMehtods {
-    private static readonly int[] nodeStatePriorityLevels = { 4, 2, 3, 1, 1, 1, -1 };
+    private static readonly int[] nodeStatePriorityLevels = { 4, 2, 3, 1, 1, 1, 1, -1 };
     public static int Priority(this AreaNodeVisualisationStates s) {
         return nodeStatePriorityLevels[(int)s];
     }

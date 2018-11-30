@@ -53,7 +53,7 @@ public class AreaNodeVisualisation : MonoBehaviour {
         get { return currentState; }
         set {
             currentState = value;
-            Debug.Log("switching to " + value + " (priority of this state is "+value.Priority());
+            Debug.Log("switching to " + value + " priority of this state is "+value.Priority());
             if (value == AreaNodeVisualisationStates.MAIN_AGENT_IN_AREA) { meshRenderer.material = mainAgentInAreaMaterial; }
             else if (value == AreaNodeVisualisationStates.COMBAT_CONTACT) { meshRenderer.material = combatContactMaterial; }
             else if (value == AreaNodeVisualisationStates.CONFIRMED_ENEMIES) { meshRenderer.material = confirmedEnemiesMaterial; }
