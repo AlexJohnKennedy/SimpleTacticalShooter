@@ -91,6 +91,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour, ICombatAi {
             }
 
             AttemptToShoot(currentTarget);
+            prevTargetDistance = currDist;
         }
         else {
             agent.isStopped = false; // Resume walking if there is no target to worry about!

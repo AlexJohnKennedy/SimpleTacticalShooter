@@ -92,26 +92,26 @@ public class AreaNodeManager : MonoBehaviour {
 
     // Handler functions for when our main character percieves things about other characters.
     private void MainCharacterEngagedEnemy(object sender, ICharacter enemy) {
-        DebuggingHelpers.PrintCurrentMethodName();
+        // DebuggingHelpers.PrintCurrentMethodName();
         characterStateMap[enemy] = AreaNodeVisualisationStates.COMBAT_CONTACT;
         UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
     }
     private void MainCharacterDisengagedEnemy(object sender, ICharacter enemy) {
-        DebuggingHelpers.PrintCurrentMethodName();
+        // DebuggingHelpers.PrintCurrentMethodName();
         if (characterStateMap[enemy] == AreaNodeVisualisationStates.COMBAT_CONTACT) {
             characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
             UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
         }
     }
     private void MainCharacterSpottedEnemy(object sender, ICharacter enemy) {
-        DebuggingHelpers.PrintCurrentMethodName();
+        // DebuggingHelpers.PrintCurrentMethodName();
         if (AreaNodeVisualisationStates.CONFIRMED_ENEMIES.Priority() > characterStateMap[enemy].Priority()) {
             characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
             UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
         }
     }
     private void MainCharacterLostEnemy(object sender, ICharacter enemy) {
-        DebuggingHelpers.PrintCurrentMethodName();
+        // DebuggingHelpers.PrintCurrentMethodName();
         characterStateMap[enemy] = AreaNodeVisualisationStates.UNCONTROLLED;
         UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
     }
