@@ -27879,6 +27879,11 @@ Prefab:
       propertyPath: m_Name
       value: NPC (Enemy 1)
       objectReference: {fileID: 0}
+    - target: {fileID: 114539288840052858, guid: bb0d013ab39222b4bb2b57d4f75e6c9d,
+        type: 2}
+      propertyPath: bulletDamage
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
   m_IsPrefabAsset: 0
@@ -31323,6 +31328,11 @@ Prefab:
     - target: {fileID: 1732145380654962, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}
       propertyPath: m_Name
       value: NPC (Main)
+      objectReference: {fileID: 0}
+    - target: {fileID: 114539288840052858, guid: bb0d013ab39222b4bb2b57d4f75e6c9d,
+        type: 2}
+      propertyPath: bulletDamage
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb0d013ab39222b4bb2b57d4f75e6c9d, type: 2}

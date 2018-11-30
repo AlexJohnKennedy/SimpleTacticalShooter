@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using HelperFunctions;
 
 /** This class is responsible for managing the highlighting of area visualisation nodes in a central location by tracking all characters in the scene,
  *  and tracking all 'area nodes' in the scene, and mapping which characters are currently within each area. This will also track which character is 
@@ -30,6 +31,7 @@ public class AreaNodeManager : MonoBehaviour {
 
     // Handler functions for when characters move from zone to zone.
     private void HandleCharacterEnterAreaEvent(object sender, ICharacter character) {
+        DebuggingHelpers.PrintCurrentMethodName();
         AreaNodeVisualisation area = (AreaNodeVisualisation)sender;
 
         // Whatever the state of the area the Character was PREVIOUSLY in should become the state of the new area, unless the entered area already has a state which supersedes it.
@@ -42,6 +44,7 @@ public class AreaNodeManager : MonoBehaviour {
         characterAreaMap[character] = area;
     }
     private void HandleCharacterExitAreaEvent(object sender, ICharacter character) {
+        DebuggingHelpers.PrintCurrentMethodName();
         AreaNodeVisualisation area = (AreaNodeVisualisation)sender;
 
         if (characterAreaMap[character] == area) {
@@ -89,22 +92,26 @@ public class AreaNodeManager : MonoBehaviour {
 
     // Handler functions for when our main character percieves things about other characters.
     private void MainCharacterEngagedEnemy(object sender, ICharacter enemy) {
+        DebuggingHelpers.PrintCurrentMethodName();
         characterStateMap[enemy] = AreaNodeVisualisationStates.COMBAT_CONTACT;
         UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
     }
     private void MainCharacterDisengagedEnemy(object sender, ICharacter enemy) {
+        DebuggingHelpers.PrintCurrentMethodName();
         if (characterStateMap[enemy] == AreaNodeVisualisationStates.COMBAT_CONTACT) {
             characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
             UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
         }
     }
     private void MainCharacterSpottedEnemy(object sender, ICharacter enemy) {
+        DebuggingHelpers.PrintCurrentMethodName();
         if (AreaNodeVisualisationStates.CONFIRMED_ENEMIES.Priority() > characterStateMap[enemy].Priority()) {
             characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
             UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
         }
     }
     private void MainCharacterLostEnemy(object sender, ICharacter enemy) {
+        DebuggingHelpers.PrintCurrentMethodName();
         characterStateMap[enemy] = AreaNodeVisualisationStates.UNCONTROLLED;
         UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
     }

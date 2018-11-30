@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace HelperFunctions {
     public static class DebuggingHelpers {
@@ -51,6 +54,32 @@ namespace HelperFunctions {
             if (!showDebugging) return;
             Debug.Log(msg);
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static string GetCurrentMethodName() {
+            StackTrace st = new StackTrace();
+            StackFrame sf = st.GetFrame(2);
+
+            return sf.GetMethod().Name;
+        }
+
+        public static string GetCurrentCallstackNames(int maxDepth) {
+            var st = new StackTrace();
+            var sf = st.GetFrame(1);
+            string names = sf.GetMethod().Name;
+            for (int i = 1; i < maxDepth && i < st.FrameCount; i++) {
+                sf = st.GetFrame(i + 1);
+                names = names + ", " + sf.GetMethod().Name;
+            }
+
+            return names;
+        }
+
+        public static void PrintCurrentMethodName() {
+            if (!showDebugging) return;
+            Debug.Log(GetCurrentMethodName());
+        }
+
     }
 }
 

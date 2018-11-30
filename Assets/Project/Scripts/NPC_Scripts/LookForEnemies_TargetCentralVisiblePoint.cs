@@ -50,6 +50,7 @@ public class LookForEnemies_TargetCentralVisiblePoint : MonoBehaviour, ICharacte
             }
 
             // Notify interested parties of the update!
+            DebuggingHelpers.Log("I am the ICharacterDetector and i am sending a vision update, sending " + visibleCharacterColliders.Count + " possible colliders to check");
             VisionUpdatedEvent?.Invoke(this, visibleCharacterColliders);
         }
     }
