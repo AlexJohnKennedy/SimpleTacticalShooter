@@ -17,7 +17,7 @@ public class LookForEnemies_TargetCentralVisiblePoint : MonoBehaviour, ICharacte
     public bool showingCorners;
 
     [HideInInspector]
-    public event EventHandler<List<TargetInformation>> VisionUpdatedEvent;   // Interested parties can receive updates when we do vision updates.
+    public event EventHandler<IReadOnlyList<TargetInformation>> VisionUpdatedEvent;   // Interested parties can receive updates when we do vision updates.
 
     private List<Collider> selfColliders;
     private float nextCheckTime;
@@ -50,8 +50,8 @@ public class LookForEnemies_TargetCentralVisiblePoint : MonoBehaviour, ICharacte
             }
 
             // Notify interested parties of the update!
-            DebuggingHelpers.Log("I am the ICharacterDetector and i am sending a vision update, sending " + visibleCharacterColliders.Count + " possible colliders to check");
-            VisionUpdatedEvent?.Invoke(this, visibleCharacterColliders);
+            // DebuggingHelpers.Log("I am the ICharacterDetector and i am sending a vision update, sending " + visibleCharacterColliders.Count + " possible colliders to check");
+            VisionUpdatedEvent?.Invoke(this, visibleCharacterColliders.AsReadOnly());
         }
     }
 

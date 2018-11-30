@@ -4,7 +4,8 @@ using System;
 using UnityEngine;
 
 public interface ICharacterDetector {
-    event EventHandler<List<TargetInformation>> VisionUpdatedEvent;
+    // The detector must return a readonly collection, to prevent a listener function from modifying the contents before the next listener has a chance to see which targets are visible.
+    event EventHandler<IReadOnlyList<TargetInformation>> VisionUpdatedEvent;
 }
 
 public interface IGunMechanics {

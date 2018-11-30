@@ -171,7 +171,10 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour, ICombatAi {
     }
 
     // Handler logic - will be invoked every time we get new information about what characters we can see.
-    private void HandleNewPerception(object sender, List<TargetInformation> visibleColliders) {
+    private void HandleNewPerception(object sender, IReadOnlyList<TargetInformation> eventData) {
+        // Copy all our data into a local, mutable list which we can safely work with without affecting the sender's data (which is a read only collection)
+        List<TargetInformation> visibleColliders = new List<TargetInformation>(eventData);
+
         // Treat all visible characters as enemies. 
         // Target the nearest visible character.
         if (visibleColliders.Count > 0) {

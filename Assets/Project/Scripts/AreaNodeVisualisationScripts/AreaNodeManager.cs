@@ -117,6 +117,7 @@ public class AreaNodeManager : MonoBehaviour {
     }
 
     private void UpdateAreaStateBasedOnCharactersWithinIt(AreaNodeVisualisation area) {
+        if (area == null) { return; }
         AreaNodeVisualisationStates state = AreaNodeVisualisationStates.UNCONTROLLED;
         foreach (ICharacter c in area.AgentsInZone) {
             if (characterStateMap[c].Priority() >= state.Priority()) {

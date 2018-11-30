@@ -41,13 +41,13 @@ public class SimpleCharacterPerceptionManager : MonoBehaviour, IPerceptionEventI
 
     // This function is the Event handler we register to receive updates from the CharacterDetector.
     // TODO: Currently stupidly inefficient. Make it not retarded alex.
-    private void HandleVisionCheckUpdate(object sender, List<TargetInformation> visibleTargets) {
-        DebuggingHelpers.Log("Checking..." + visibleTargets.Count + " things to check");
+    private void HandleVisionCheckUpdate(object sender, IReadOnlyList<TargetInformation> visibleTargets) {
+        // DebuggingHelpers.Log("Checking..." + visibleTargets.Count + " things to check");
         Dictionary<ICharacter, AwarenessStates> newState = new Dictionary<ICharacter, AwarenessStates>();
         
         // Simply cycle the list and add/remove anything accordingly.
         foreach (TargetInformation t in visibleTargets) {
-            DebuggingHelpers.Log("Checking a target");
+            // DebuggingHelpers.Log("Checking a target");
             if (t.IsCharacter) {
                 if (!enemiesAwareOf.ContainsKey(t.character)) {
                     // Look! a newly spotted enemy!
