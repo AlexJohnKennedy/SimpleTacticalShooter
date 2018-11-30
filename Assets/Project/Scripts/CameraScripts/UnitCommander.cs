@@ -20,7 +20,6 @@ public class UnitCommander : MonoBehaviour {
             if (Physics.Raycast(ray, out hitInfo, 10000f, mask, QueryTriggerInteraction.Ignore)) {
                 NavMeshAgent agent = hitInfo.collider.gameObject.GetComponent<NavMeshAgent>();
                 if (agent != null) currentlySelectedAgent = agent;
-                Debug.Log(hitInfo.point);
             }
         }
 		if (currentlySelectedAgent != null && Input.GetMouseButtonDown(1)) {
