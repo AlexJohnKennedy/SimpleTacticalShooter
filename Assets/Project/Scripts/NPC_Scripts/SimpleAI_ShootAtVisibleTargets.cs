@@ -67,6 +67,9 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour, ICombatAi {
             currentTarget = newTarget;
             newTarget = null;
 
+            // Invoke the target engaged event!
+            if (currentTarget != null) EnemyEngagedEvent?.Invoke(this, currentTarget);
+
             // If the target is further away than the stand still threshold, then we should stop moving to aim carefully!
             prevTargetDistance = Vector3.Distance(transform.position, currentTarget.collider.transform.position);
             if (prevTargetDistance > standStillThreshold) {

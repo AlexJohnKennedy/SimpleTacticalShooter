@@ -80,6 +80,7 @@ public class SimpleCharacterPerceptionManager : MonoBehaviour, IPerceptionEventI
             EnemyEngagedEvent?.Invoke(this, enemy.character);
         }
         else if (enemiesAwareOf[enemy.character] != AwarenessStates.EngagedWith) {
+            enemiesAwareOf[enemy.character] = AwarenessStates.EngagedWith;
             EnemyEngagedEvent?.Invoke(this, enemy.character);
         }
         else {
