@@ -41,6 +41,7 @@ public class AreaNodeVisualisation : MonoBehaviour {
     // Events the area node manager will be interested in.
     public event EventHandler<ICharacter> CharacterEnteredZone;
     public event EventHandler<ICharacter> CharacterExitedZone;
+    public event Action<AreaNodeVisualisation> AreaRequestsUpdate;
 
     private HashSet<ICharacter> agentsInZone;
     public HashSet<ICharacter> AgentsInZone {
@@ -90,12 +91,17 @@ public class AreaNodeVisualisation : MonoBehaviour {
         GameObject.FindGameObjectWithTag("GameController").GetComponent<AreaNodeManager>().RegisterAreaNode(this);
     }
 
+    
+
     // Define logic for tracking when character objects enter and exit the area.
     void OnTriggerEnter(Collider other) {
         ICharacter character = other.GetComponent<ICharacter>();
         if (character != null) {
             // The thing which entered the trigger is a character!
             agentsInZone.Add(character);
+
+            // Make sure we listen to see if this character is killed while within this area. That way we can update ourselves if need be! Make sure to deregister when the character's leave.
+            character.CharacterKilledEvent += CharacterKilledHandler;
 
             // Inform our manager! (or anyone who cares..)
             CharacterEnteredZone?.Invoke(this, character);
@@ -107,9 +113,20 @@ public class AreaNodeVisualisation : MonoBehaviour {
             // The thing which left the trigger is a character!
             agentsInZone.Remove(character);
 
+            // We no longer need to know if this character dies or not. It's someone else's problem!
+            character.CharacterKilledEvent -= CharacterKilledHandler;
+
             // Inform our manager! (or anyone who cares..)
             CharacterExitedZone?.Invoke(this, character);
         }
+    }
+
+    private void CharacterKilledHandler(ICharacter justDied) {
+        // Some manager object may have already forced us to remove this character, but maybe not. So let's check this ourselves.
+        if (agentsInZone.Contains(justDied)) {
+            agentsInZone.Remove(justDied);
+        }
+        AreaRequestsUpdate?.Invoke(this);
     }
 
     private Mesh GenerateAreaMesh() {

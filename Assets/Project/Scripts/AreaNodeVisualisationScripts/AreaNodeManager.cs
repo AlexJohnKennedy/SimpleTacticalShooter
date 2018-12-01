@@ -27,6 +27,7 @@ public class AreaNodeManager : MonoBehaviour {
         areaNodeVisualisations.Add(a);
         a.CharacterEnteredZone += HandleCharacterEnterAreaEvent;
         a.CharacterExitedZone += HandleCharacterExitAreaEvent;
+        a.AreaRequestsUpdate += (area) => UpdateAreaStateBasedOnCharactersWithinIt(area);
     }
 
     // Handler functions for when characters move from zone to zone.
@@ -71,6 +72,7 @@ public class AreaNodeManager : MonoBehaviour {
             else {
                 characterAreaMap.Add(ch, null);    // For now we don't know the starting Area.
                 characterStateMap.Add(ch, AreaNodeVisualisationStates.NULL);
+                ch.CharacterKilledEvent += HandleCharacterDeath;
 
                 // If this character is the main character, we need to make sure to listen to it's perception events!!
                 if (ch == mainCharacter) {
@@ -90,13 +92,32 @@ public class AreaNodeManager : MonoBehaviour {
         p.EnemyLostEvent += MainCharacterLostEnemy;
     }
 
+    // Handler function for when any character is killed. We will simply remove them from all of our tracking systems.
+    private void HandleCharacterDeath(ICharacter c) {
+        characterAreaMap.Remove(c);
+        characterStateMap.Remove(c);
+
+        // If the character which died was the main character, then we should just remove everything, and set everything back to default.
+        foreach (AreaNodeVisualisation a in areaNodeVisualisations) {
+            a.CurrentState = AreaNodeVisualisationStates.UNCONTROLLED;
+            Destroy(a);
+        }
+        Destroy(this);
+    }
+
     // Handler functions for when our main character percieves things about other characters.
     private void MainCharacterEngagedEnemy(object sender, ICharacter enemy) {
+        // Check if this character has even registerd or has not been considered 'destroyed'
+        if (!characterStateMap.ContainsKey(enemy) || !characterAreaMap.ContainsKey(enemy)) { return; }
+
         // DebuggingHelpers.PrintCurrentMethodName();
         characterStateMap[enemy] = AreaNodeVisualisationStates.COMBAT_CONTACT;
         UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
     }
     private void MainCharacterDisengagedEnemy(object sender, ICharacter enemy) {
+        // Check if this character has even registerd or has not been considered 'destroyed'
+        if (!characterStateMap.ContainsKey(enemy) || !characterAreaMap.ContainsKey(enemy)) { return; }
+
         // DebuggingHelpers.PrintCurrentMethodName();
         if (characterStateMap[enemy] == AreaNodeVisualisationStates.COMBAT_CONTACT) {
             characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
@@ -104,6 +125,9 @@ public class AreaNodeManager : MonoBehaviour {
         }
     }
     private void MainCharacterSpottedEnemy(object sender, ICharacter enemy) {
+        // Check if this character has even registerd or has not been considered 'destroyed'
+        if (!characterStateMap.ContainsKey(enemy) || !characterAreaMap.ContainsKey(enemy)) { return; }
+
         // DebuggingHelpers.PrintCurrentMethodName();
         if (AreaNodeVisualisationStates.CONFIRMED_ENEMIES.Priority() > characterStateMap[enemy].Priority()) {
             characterStateMap[enemy] = AreaNodeVisualisationStates.CONFIRMED_ENEMIES;
@@ -111,6 +135,9 @@ public class AreaNodeManager : MonoBehaviour {
         }
     }
     private void MainCharacterLostEnemy(object sender, ICharacter enemy) {
+        // Check if this character has even registerd or has not been considered 'destroyed'
+        if (!characterStateMap.ContainsKey(enemy) || !characterAreaMap.ContainsKey(enemy)) { return; }
+
         // DebuggingHelpers.PrintCurrentMethodName();
         characterStateMap[enemy] = AreaNodeVisualisationStates.UNCONTROLLED;
         UpdateAreaStateBasedOnCharactersWithinIt(characterAreaMap[enemy]);
