@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 // Simple implementation for a root class which represents a character in the world with a persistent identity.
 
@@ -10,6 +11,8 @@ using UnityEngine;
 [RequireComponent(typeof(ICharacterAwarenessState))]
 [DisallowMultipleComponent]
 public class SimpleCharacter : MonoBehaviour, ICharacter {
+
+    public event Action<ICharacter> CharacterKilledEvent;
 
     // This boy is just a big bag of generic components so that those components can collectively represent one 'character', being
     // attached in a central location.
@@ -46,13 +49,8 @@ public class SimpleCharacter : MonoBehaviour, ICharacter {
         return perceptionEventInvoker;
     }
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    // Simply way to detect if this character has died is if this gameobject is being destroyed or disabled. Note 'OnDisable' is called in both of these circumstances.
+    private void OnDisable() {
+        CharacterKilledEvent?.Invoke(this);
+    }
 }

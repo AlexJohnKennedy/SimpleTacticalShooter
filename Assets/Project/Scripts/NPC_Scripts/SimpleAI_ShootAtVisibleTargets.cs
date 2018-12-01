@@ -77,27 +77,45 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour, ICombatAi {
             }
         }
 
-        // If we have a target, then rather than just walking around, we should lookat, and shoot at, our target!
+        // If we have a target, then rather than just walking around, we should lookat, and shoot at, our target! If the target info contains a null reference we assume our target was destroyed.
         if (currentTarget != null) {
-            AimTowardsTarget(currentTarget);
-
-            // If the target was previously inside our distance threshold, and just moved outside of it this tick, then we should stop moving and aim carefully.
-            float currDist = Vector3.Distance(transform.position, currentTarget.collider.transform.position);
-            if (prevTargetDistance <= standStillThreshold && currDist > standStillThreshold) {
-                agent.isStopped = true;  // Pause the agent's path.
+            // Check if the target has been killed. If so, reset the current target.
+            if (!TargetStillAlive(currentTarget)) {
+                currentTarget = null;
             }
-            else if (currDist < standStillThreshold) {
-                agent.isStopped = false; // Resume walking if the target get's too close!
-            }
+            // We have a target, and that target is still alive! Let's continue our logic.
+            else {
+                AimTowardsTarget(currentTarget);
 
-            AttemptToShoot(currentTarget);
-            prevTargetDistance = currDist;
+                // If the target was previously inside our distance threshold, and just moved outside of it this tick, then we should stop moving and aim carefully.
+                float currDist = Vector3.Distance(transform.position, currentTarget.collider.transform.position);
+                if (prevTargetDistance <= standStillThreshold && currDist > standStillThreshold) {
+                    agent.isStopped = true;  // Pause the agent's path.
+                }
+                else if (currDist < standStillThreshold) {
+                    agent.isStopped = false; // Resume walking if the target get's too close!
+                }
+
+                AttemptToShoot(currentTarget);
+                prevTargetDistance = currDist;
+            }
+            
         }
         else {
             agent.isStopped = false; // Resume walking if there is no target to worry about!
             AimTowardsWalkDirection();  // Turn the body back in the direction of the nav agent's facing direction!
         }
 	}
+    
+    private bool TargetStillAlive(TargetInformation t) {
+        // if either the collider null check or the character null check (given the target is a character) pass, then we assume the target object has been destroyed
+        if (t == null || t.collider == null || (t.IsCharacter && t.character == null)) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 
     // Function to define how quickly the unity will aim towards the target.
     private void AimTowardsTarget(TargetInformation target) {
@@ -196,6 +214,7 @@ public class SimpleAI_ShootAtVisibleTargets : MonoBehaviour, ICombatAi {
         }
         else {
             currentTarget = newTarget = null;
+            reacting = false;   // We lost sight of whatever we are trying to react to.
         }
     }
 

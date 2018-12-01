@@ -8,6 +8,7 @@ using UnityEngine;
 // generally just be a 'bag of decomposed interfaces' which are delegated all the more specific parts of character logic.
 public interface ICharacter {
     IPerceptionEventInvoker RequestPerceptionEventListeningRights();
+    event Action<ICharacter> CharacterKilledEvent;
 }
 
 // Serves as the generic type for instaces which control the Character GameObject (and relevant components) in order to make the character

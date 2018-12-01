@@ -31,7 +31,7 @@ public class AreaNodeManager : MonoBehaviour {
 
     // Handler functions for when characters move from zone to zone.
     private void HandleCharacterEnterAreaEvent(object sender, ICharacter character) {
-        DebuggingHelpers.PrintCurrentMethodName();
+        // DebuggingHelpers.PrintCurrentMethodName();
         AreaNodeVisualisation area = (AreaNodeVisualisation)sender;
 
         // Whatever the state of the area the Character was PREVIOUSLY in should become the state of the new area, unless the entered area already has a state which supersedes it.
@@ -44,7 +44,7 @@ public class AreaNodeManager : MonoBehaviour {
         characterAreaMap[character] = area;
     }
     private void HandleCharacterExitAreaEvent(object sender, ICharacter character) {
-        DebuggingHelpers.PrintCurrentMethodName();
+        // DebuggingHelpers.PrintCurrentMethodName();
         AreaNodeVisualisation area = (AreaNodeVisualisation)sender;
 
         if (characterAreaMap[character] == area) {
